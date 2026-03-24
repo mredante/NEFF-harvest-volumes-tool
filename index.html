@@ -1,0 +1,1324 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NEFF Wood Products Marketing Tool</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@300;400;500;600&display=swap');
+:root{--forest:#1a3a2a;--pine:#2d5a3d;--sage:#4a7c5e;--moss:#6b9e7a;--bark:#5c4a32;--cream:#f5f0e8;--parchment:#ede6d6;--gold:#c9a84c;--amber:#d4873a;--red:#b83c2a;--text:#1a1a18;--muted:#5a5a52;--border:#c8bfa8;--white:#faf8f4}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'IBM Plex Sans',sans-serif;background:var(--cream);color:var(--text);min-height:100vh;font-size:14px}
+.app-header{background:var(--forest);color:var(--cream);padding:0 24px;display:flex;align-items:center;justify-content:space-between;height:54px;border-bottom:2px solid var(--gold)}
+.app-header h1{font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:600;letter-spacing:.15em;text-transform:uppercase;color:var(--gold)}
+.app-header .subtitle{font-size:11px;color:var(--moss);font-family:'IBM Plex Mono',monospace}
+.conn-dot{width:8px;height:8px;border-radius:50%;display:inline-block;margin-right:5px;background:var(--muted)}
+.conn-dot.ok{background:#4ade80}.conn-dot.err{background:var(--red)}.conn-dot.loading{background:var(--gold)}
+.tabs{display:flex;background:var(--forest);padding:0 20px;border-bottom:1px solid var(--pine);overflow-x:auto}
+.tab-btn{padding:9px 16px;background:none;border:none;color:var(--moss);font-family:'IBM Plex Mono',monospace;font-size:10px;font-weight:500;letter-spacing:.1em;text-transform:uppercase;cursor:pointer;border-bottom:2px solid transparent;transition:all .15s;white-space:nowrap}
+.tab-btn:hover{color:var(--cream)}.tab-btn.active{color:var(--gold);border-bottom-color:var(--gold)}
+.main{padding:20px;max-width:1400px;margin:0 auto}
+.panel{display:none}.panel.active{display:block}
+.card{background:var(--white);border:1px solid var(--border);border-radius:4px;padding:18px;margin-bottom:14px}
+.card-title{font-family:'IBM Plex Mono',monospace;font-size:10px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--pine);margin-bottom:14px;padding-bottom:7px;border-bottom:1px solid var(--parchment);display:flex;align-items:center;gap:8px}
+.card-title .dot{width:6px;height:6px;background:var(--gold);border-radius:50%;flex-shrink:0}
+.form-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:10px}
+.form-group{display:flex;flex-direction:column;gap:3px;position:relative}
+.form-group label{font-size:9px;font-family:'IBM Plex Mono',monospace;font-weight:500;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.form-group input,.form-group select{padding:6px 9px;border:1px solid var(--border);border-radius:3px;font-family:'IBM Plex Sans',sans-serif;font-size:13px;color:var(--text);background:var(--white);transition:border-color .15s}
+.form-group input:focus,.form-group select:focus{outline:none;border-color:var(--pine)}
+.form-group input::placeholder{color:#bbb}
+.form-group input.location-confirmed{border-color:var(--sage);background:#f0f7f0}
+
+/* Autocomplete dropdown */
+.autocomplete-dropdown{position:absolute;top:100%;left:0;right:0;background:var(--white);border:1px solid var(--pine);border-top:none;border-radius:0 0 4px 4px;z-index:100;max-height:220px;overflow-y:auto;box-shadow:0 4px 12px rgba(0,0,0,.12)}
+.ac-item{padding:8px 10px;cursor:pointer;font-size:12px;border-bottom:1px solid var(--parchment);display:flex;flex-direction:column;gap:2px}
+.ac-item:last-child{border-bottom:none}
+.ac-item:hover{background:var(--parchment)}
+.ac-item .ac-main{font-weight:500;color:var(--text)}
+.ac-item .ac-sub{font-size:10px;color:var(--muted);font-family:'IBM Plex Mono',monospace}
+.ac-item .ac-badge{font-size:9px;font-family:'IBM Plex Mono',monospace;padding:1px 5px;border-radius:2px;background:var(--parchment);color:var(--pine);align-self:flex-start;margin-top:2px}
+.location-status{font-size:9px;font-family:'IBM Plex Mono',monospace;margin-top:3px;min-height:13px}
+.location-status.ok{color:var(--sage)}.location-status.err{color:var(--red)}.location-status.searching{color:var(--muted)}
+
+.entry-layout{display:grid;grid-template-columns:1fr 290px;gap:14px;align-items:start}
+@media(max-width:860px){.entry-layout{grid-template-columns:1fr}}
+.products-table-wrap{overflow-x:auto;max-height:560px;overflow-y:auto}
+.products-table{width:100%;border-collapse:collapse;font-size:13px}
+.products-table th{text-align:left;font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);padding:5px 8px;border-bottom:2px solid var(--parchment);background:var(--cream);position:sticky;top:0;z-index:1}
+.products-table td{padding:3px 6px;border-bottom:1px solid var(--parchment);vertical-align:middle}
+.products-table tr:hover td{background:rgba(74,124,94,.04)}
+.product-category td{background:var(--parchment)!important;font-family:'IBM Plex Mono',monospace;font-size:9px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--pine);padding:5px 8px!important}
+.vol-input{width:80px;padding:3px 7px;border:1px solid var(--border);border-radius:2px;font-family:'IBM Plex Mono',monospace;font-size:12px;text-align:right;background:var(--white)}
+.vol-input:focus{outline:none;border-color:var(--pine)}
+.unit-select{width:68px;padding:2px 4px;border:1px solid var(--border);border-radius:2px;font-family:'IBM Plex Mono',monospace;font-size:11px;background:var(--white);color:var(--text)}
+.unit-select:focus{outline:none;border-color:var(--pine)}
+.unit-label{font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--muted);padding-left:3px}
+.summary-panel{background:var(--white);border:1px solid var(--border);border-radius:4px;padding:14px;position:sticky;top:20px}
+.sp-title{font-family:'IBM Plex Mono',monospace;font-size:9px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--pine);margin-bottom:10px;padding-bottom:6px;border-bottom:1px solid var(--parchment)}
+.sp-stat{display:flex;justify-content:space-between;align-items:baseline;padding:4px 0;border-bottom:1px solid var(--parchment);font-size:12px}
+.sp-stat:last-of-type{border-bottom:none}
+.sp-label{color:var(--muted);font-size:11px}
+.sp-val{font-family:'IBM Plex Mono',monospace;font-weight:600;color:var(--pine);font-size:12px}
+.intensity-box{margin-top:10px;padding:10px;background:var(--parchment);border-radius:3px;text-align:center}
+.ib-val{font-family:'IBM Plex Mono',monospace;font-size:24px;font-weight:600;color:var(--forest)}
+.ib-label{font-size:9px;color:var(--muted);font-family:'IBM Plex Mono',monospace;text-transform:uppercase;letter-spacing:.08em}
+.sp-divider{margin:8px 0;border:none;border-top:1px solid var(--border)}
+.sp-subhead{font-family:'IBM Plex Mono',monospace;font-size:8px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin:8px 0 4px}
+.sp-line{display:flex;justify-content:space-between;font-size:10px;padding:2px 0;color:var(--text)}
+.sp-lv{font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--pine)}
+.btn{padding:8px 18px;border:none;border-radius:3px;cursor:pointer;font-family:'IBM Plex Mono',monospace;font-size:10px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;transition:all .15s}
+.btn-primary{background:var(--pine);color:var(--cream)}.btn-primary:hover{background:var(--forest)}
+.btn-primary:disabled{background:var(--muted);cursor:not-allowed}
+.btn-ghost{background:none;border:1px solid var(--border);color:var(--muted)}.btn-ghost:hover{border-color:var(--pine);color:var(--pine)}
+.btn-sm{padding:5px 12px;font-size:9px}
+.btn-row{display:flex;gap:8px;margin-top:14px;flex-wrap:wrap;align-items:center}
+#toast{position:fixed;bottom:20px;right:20px;padding:10px 18px;background:var(--pine);color:var(--cream);border-radius:4px;font-family:'IBM Plex Mono',monospace;font-size:11px;opacity:0;transform:translateY(6px);transition:all .2s;z-index:1000}
+#toast.show{opacity:1;transform:translateY(0)}
+.submission-item{background:var(--white);border:1px solid var(--border);border-left:3px solid var(--pine);border-radius:3px;padding:10px 14px;margin-bottom:7px;display:flex;justify-content:space-between;align-items:flex-start;gap:14px}
+.sub-title{font-weight:600;font-size:13px;color:var(--forest)}
+.sub-meta{font-family:'IBM Plex Mono',monospace;font-size:9px;color:var(--muted);margin-top:3px;display:flex;gap:12px;flex-wrap:wrap}
+.region-badge{display:inline-block;padding:2px 7px;border-radius:2px;font-family:'IBM Plex Mono',monospace;font-size:9px;font-weight:600;letter-spacing:.08em;text-transform:uppercase}
+.region-ME{background:#dbeafe;color:#1e40af}.region-NH{background:#dcfce7;color:#166534}
+.region-MA{background:#fef3c7;color:#92400e}.region-VT{background:#f3e8ff;color:#581c87}
+.region-CT{background:#ffe4e6;color:#9f1239}.region-NA{background:#f3f4f6;color:#374151}
+.region-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:14px;margin-bottom:18px}
+.region-card{background:var(--white);border:1px solid var(--border);border-radius:4px;overflow:hidden}
+.region-header{padding:9px 14px;display:flex;align-items:center;justify-content:space-between}
+.rh-name{font-family:'IBM Plex Mono',monospace;font-weight:700;font-size:17px;letter-spacing:.05em}
+.rh-sub{font-size:10px;opacity:.8}
+.rh-ME{background:#1e40af;color:white}.rh-NH{background:#166534;color:white}
+.rh-MA{background:#92400e;color:white}.rh-VT{background:#581c87;color:white}
+.rh-CT{background:#9f1239;color:white}.rh-NA{background:#374151;color:white}
+.region-products{padding:6px 0;max-height:260px;overflow-y:auto}
+.rp-row{display:flex;justify-content:space-between;align-items:center;padding:4px 14px;font-size:12px;border-bottom:1px solid var(--parchment)}
+.rp-row:last-child{border-bottom:none}
+.rp-vol{font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:600;color:var(--pine)}
+.rp-unit{color:var(--muted);font-size:9px;margin-left:3px}
+.rp-cat-header{padding:3px 14px;font-family:'IBM Plex Mono',monospace;font-size:8px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);background:var(--cream)}
+.empty-state{padding:18px;text-align:center;font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--muted)}
+.loading-state{padding:18px;text-align:center;font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--muted)}
+.stats-row{display:flex;gap:10px;margin-bottom:18px;flex-wrap:wrap}
+.stat-box{background:var(--white);border:1px solid var(--border);border-radius:4px;padding:10px 14px;flex:1;min-width:110px}
+.stat-box .sv{font-family:'IBM Plex Mono',monospace;font-size:22px;font-weight:600;color:var(--pine)}
+.stat-box .sl{font-size:9px;color:var(--muted);margin-top:2px;font-family:'IBM Plex Mono',monospace;letter-spacing:.05em;text-transform:uppercase}
+.mill-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:10px}
+.mill-card{background:var(--white);border:1px solid var(--border);border-radius:4px;padding:12px 14px}
+.mill-card .mill-name{font-weight:600;font-size:13px;color:var(--forest)}
+.mill-card .mill-loc{font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--muted);margin-top:2px}
+.mill-products-list{margin-top:7px;display:flex;flex-wrap:wrap;gap:3px}
+.mill-product-tag{padding:2px 6px;background:var(--parchment);border:1px solid var(--border);border-radius:2px;font-size:9px;font-family:'IBM Plex Mono',monospace;color:var(--pine)}
+.match-card{background:var(--white);border:1px solid var(--border);border-radius:4px;margin-bottom:10px;overflow:hidden}
+.match-header{padding:9px 14px;background:var(--parchment);display:flex;align-items:center;gap:10px;border-bottom:1px solid var(--border)}
+.mh-product{font-weight:600;font-size:13px}
+.mh-vol{font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--pine);margin-left:auto}
+.match-cols{display:grid;grid-template-columns:2.2fr 1fr 1fr 1fr 1.1fr;gap:4px;padding:5px 14px;font-family:'IBM Plex Mono',monospace;font-size:8px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);background:var(--cream)}
+.match-mill-row{display:grid;grid-template-columns:2.2fr 1fr 1fr 1fr 1.1fr;gap:4px;align-items:center;padding:7px 14px;border-bottom:1px solid var(--parchment)}
+.match-mill-row:last-child{border-bottom:none}
+.rank-badge{width:20px;height:20px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'IBM Plex Mono',monospace;font-size:9px;font-weight:700;flex-shrink:0}
+.rank-1{background:var(--gold);color:var(--forest)}.rank-2{background:var(--parchment);color:var(--bark);border:1px solid var(--border)}.rank-3{background:var(--cream);color:var(--muted);border:1px solid var(--border)}
+.mmr-name{font-size:12px;font-weight:500;display:flex;align-items:center;gap:6px}
+.mmr-cell{font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--muted)}
+.mmr-cell.pos{color:var(--pine);font-weight:600}
+.roads-badge{display:inline-flex;align-items:center;padding:0 4px;border-radius:2px;font-size:8px;font-family:'IBM Plex Mono',monospace}
+.roads-badge.road{background:#dcfce7;color:#166534}.roads-badge.est{background:#fef3c7;color:#92400e}
+.toolbar{display:flex;align-items:center;gap:8px;margin-bottom:14px;flex-wrap:wrap}
+.search-bar{padding:7px 10px;border:1px solid var(--border);border-radius:3px;font-family:'IBM Plex Sans',sans-serif;font-size:13px;width:260px;background:var(--white)}
+.search-bar:focus{outline:none;border-color:var(--pine)}
+.section-title{font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--forest);margin-bottom:10px;margin-top:18px;padding-bottom:5px;border-bottom:1px solid var(--parchment)}
+.section-title:first-child{margin-top:0}
+.mill-form-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
+.mill-form-products{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:4px;margin-top:8px;max-height:200px;overflow-y:auto;padding:8px;background:var(--parchment);border-radius:3px}
+.mill-product-check{display:flex;align-items:center;gap:5px;font-size:11px;cursor:pointer}
+.mill-product-check input{cursor:pointer;accent-color:var(--pine)}
+.price-input{width:65px;padding:2px 5px;border:1px solid var(--border);border-radius:2px;font-family:'IBM Plex Mono',monospace;font-size:10px;text-align:right}
+.price-input:focus{outline:none;border-color:var(--pine)}
+.harvest-select{padding:6px 10px;border:1px solid var(--border);border-radius:3px;font-family:'IBM Plex Sans',sans-serif;font-size:13px;background:var(--white)}
+.no-mills-msg{padding:14px;background:var(--parchment);border-radius:3px;font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--muted);text-align:center}
+.delete-sub-btn{background:none;border:none;cursor:pointer;color:var(--muted);font-size:16px;padding:2px 4px;border-radius:2px;transition:color .15s;flex-shrink:0}
+.delete-sub-btn:hover{color:var(--red)}
+.view-sub-btn{background:none;border:none;cursor:pointer;color:var(--pine);font-family:'IBM Plex Mono',monospace;font-size:9px;text-decoration:underline;padding:0;margin-top:4px}
+.sub-products-preview{margin-top:7px;display:flex;flex-wrap:wrap;gap:3px}
+.sub-prod-tag{background:var(--parchment);padding:1px 6px;border-radius:2px;font-family:'IBM Plex Mono',monospace;font-size:9px;color:var(--pine)}
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:200;display:flex;align-items:center;justify-content:center;padding:20px}
+.modal{background:var(--white);border-radius:4px;max-width:720px;width:100%;max-height:85vh;overflow:hidden;display:flex;flex-direction:column;border:1px solid var(--border)}
+.modal-header{padding:14px 18px;background:var(--forest);color:var(--cream);display:flex;align-items:center;justify-content:space-between}
+.modal-header h3{font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--gold)}
+.modal-close{background:none;border:none;color:var(--cream);cursor:pointer;font-size:18px;line-height:1}
+.modal-body{padding:16px 18px;overflow-y:auto}
+.detail-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px}
+.detail-label{font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.detail-value{font-size:13px;margin-top:2px}
+.harvest-map-link{font-size:11px;color:var(--pine);text-decoration:none;font-family:'IBM Plex Mono',monospace}
+.harvest-map-link:hover{text-decoration:underline}
+.mill-delete-btn{background:none;border:none;cursor:pointer;color:var(--muted);font-size:14px;padding:2px;transition:color .15s}
+.mill-delete-btn:hover{color:var(--red)}
+.mill-card-header{display:flex;justify-content:space-between;align-items:flex-start}
+.note-text{font-size:11px;color:var(--muted);font-style:italic;margin-top:8px}
+.config-banner{background:var(--parchment);border:1px solid var(--border);border-left:3px solid var(--gold);border-radius:3px;padding:10px 14px;margin-bottom:14px;font-size:12px;font-family:'IBM Plex Mono',monospace;color:var(--bark)}
+.config-banner strong{color:var(--forest)}
+</style>
+</head>
+<body>
+
+<div class="app-header">
+  <h1>NEFF // Wood Products Marketing Tool</h1>
+  <span class="subtitle">
+    <span class="conn-dot loading" id="conn-dot"></span>
+    <span id="conn-label">connecting...</span>
+  </span>
+</div>
+
+<div class="tabs">
+  <button class="tab-btn active" onclick="showTab('entry')">&#9658; Submit Harvest</button>
+  <button class="tab-btn" onclick="showTab('submissions')">&#9658; All Submissions</button>
+  <button class="tab-btn" onclick="showTab('dashboard')">&#9658; Regional Dashboard</button>
+  <button class="tab-btn" onclick="showTab('mills')">&#9658; Mill Database</button>
+  <button class="tab-btn" onclick="showTab('matching')">&#9658; Mill Matching</button>
+</div>
+
+<div class="main">
+
+<!-- ===== ENTRY ===== -->
+<div id="tab-entry" class="panel active">
+  <div id="config-warn" class="config-banner" style="display:none">
+    <strong>&#9888; Airtable not configured.</strong> Submissions will save locally in this browser only. Add your AIRTABLE_TOKEN and AIRTABLE_BASE_ID to the config section at the top of the HTML file to enable shared data across all foresters.
+  </div>
+  <div class="card">
+    <div class="card-title"><span class="dot"></span>Harvest Information</div>
+    <div class="form-grid">
+      <div class="form-group">
+        <label>Woodlot Name</label>
+        <input type="text" id="f-woodlot" placeholder="e.g. Kimball Hill">
+      </div>
+      <div class="form-group">
+        <label>State</label>
+        <select id="f-state">
+          <option value="">-- Select --</option>
+          <option>ME</option><option>NH</option><option>MA</option><option>VT</option><option>CT</option>
+        </select>
+      </div>
+      <div class="form-group" id="location-group" style="grid-column:span 2">
+        <label>Harvest Location <span style="font-weight:400;text-transform:none;letter-spacing:0">&mdash; start typing a town, road, or property name</span></label>
+        <input type="text" id="f-location" placeholder="e.g. Freeport ME, or Kezar Falls, or 34 Rangeley Rd..."
+          autocomplete="off" oninput="onLocationInput()" onfocus="onLocationInput()">
+        <div class="autocomplete-dropdown" id="ac-dropdown" style="display:none"></div>
+        <div class="location-status" id="location-status"></div>
+        <!-- Hidden fields storing resolved coordinates -->
+        <input type="hidden" id="f-lat">
+        <input type="hidden" id="f-lng">
+        <input type="hidden" id="f-location-display">
+      </div>
+      <div class="form-group">
+        <label>Harvest Acreage</label>
+        <input type="number" id="f-acres" placeholder="e.g. 45" min="0" step="0.1" oninput="updateSummary()">
+      </div>
+      <div class="form-group">
+        <label>Harvest System</label>
+        <select id="f-system">
+          <option value="">-- Select --</option>
+          <option>CTL</option><option>Hand Crew</option><option>Unknown at this time</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Delivery Window</label>
+        <input type="text" id="f-timing" placeholder="e.g. June-August 2025">
+      </div>
+      <div class="form-group">
+        <label>Forester Name</label>
+        <input type="text" id="f-forester" placeholder="Your name">
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title"><span class="dot"></span>Product Volumes</div>
+    <div class="entry-layout">
+      <div>
+        <div class="products-table-wrap">
+          <table class="products-table">
+            <thead>
+              <tr>
+                <th style="width:230px">Product</th>
+                <th style="width:90px">Volume</th>
+                <th style="width:74px">Unit</th>
+                <th>Notes</th>
+              </tr>
+            </thead>
+            <tbody id="products-tbody"></tbody>
+          </table>
+        </div>
+        <div class="btn-row">
+          <button class="btn btn-primary" id="submit-btn" onclick="submitHarvest()">Submit Harvest Data</button>
+          <button class="btn btn-ghost" onclick="clearForm()">Clear Form</button>
+          <span style="font-family:'IBM Plex Mono',monospace;font-size:9px;color:var(--muted);margin-left:auto">Tons converted to cords on submit (2.6 t/cord)</span>
+        </div>
+      </div>
+      <!-- Running summary panel -->
+      <div class="summary-panel">
+        <div class="sp-title">&#9654; Running Summary</div>
+        <div class="sp-stat"><span class="sp-label">Products entered</span><span class="sp-val" id="rs-count">0</span></div>
+        <div class="sp-stat"><span class="sp-label">Cords (direct)</span><span class="sp-val" id="rs-cords">—</span></div>
+        <div class="sp-stat"><span class="sp-label">MBF (direct)</span><span class="sp-val" id="rs-mbf">—</span></div>
+        <div class="sp-stat"><span class="sp-label">Tons (direct)</span><span class="sp-val" id="rs-tons">—</span></div>
+        <div class="intensity-box" id="rs-intensity-box" style="display:none">
+          <div class="ib-val" id="rs-intensity-val">—</div>
+          <div class="ib-label">Cords / Acre</div>
+          <div style="font-size:9px;color:var(--muted);margin-top:2px">all products converted</div>
+        </div>
+        <hr class="sp-divider">
+        <div class="sp-subhead">By category (cords equiv.)</div>
+        <div id="rs-by-cat"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== SUBMISSIONS ===== -->
+<div id="tab-submissions" class="panel">
+  <div class="toolbar">
+    <input class="search-bar" id="sub-search" placeholder="Search woodlot, forester, state..." oninput="renderSubmissions()">
+    <select class="harvest-select" id="sub-region-filter" onchange="renderSubmissions()">
+      <option value="">All Regions</option><option>ME</option><option>NH</option><option>MA</option><option>VT</option><option>CT</option>
+    </select>
+    <span id="sub-count" style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--muted);margin-left:auto"></span>
+  </div>
+  <div id="submissions-list"><div class="loading-state">Loading submissions...</div></div>
+</div>
+
+<!-- ===== DASHBOARD ===== -->
+<div id="tab-dashboard" class="panel">
+  <div class="stats-row" id="dash-stats"></div>
+  <div class="section-title">Volumes by Region</div>
+  <div class="region-grid" id="region-cards"></div>
+  <div class="section-title">Aggregate Volume by Product (All Regions)</div>
+  <div id="aggregate-table-wrap"></div>
+</div>
+
+<!-- ===== MILLS ===== -->
+<div id="tab-mills" class="panel">
+  <div class="card">
+    <div class="card-title"><span class="dot"></span>Add / Edit Mill</div>
+    <div class="mill-form-grid">
+      <div class="form-group"><label>Mill Name</label><input type="text" id="m-name" placeholder="e.g. Sappi Skowhegan"></div>
+      <div class="form-group"><label>State</label>
+        <select id="m-state"><option value="">--</option><option>ME</option><option>NH</option><option>MA</option><option>VT</option><option>CT</option><option>NY</option><option>Other</option></select>
+      </div>
+      <div class="form-group"><label>Town / Location</label><input type="text" id="m-town" placeholder="Skowhegan, ME"></div>
+      <div class="form-group"><label>Latitude</label><input type="number" id="m-lat" placeholder="44.7654" step="0.0001"></div>
+      <div class="form-group"><label>Longitude</label><input type="number" id="m-lng" placeholder="-69.7123" step="0.0001"></div>
+      <div class="form-group"><label>Contact / Notes</label><input type="text" id="m-contact" placeholder="Buyer name, phone..."></div>
+    </div>
+    <div class="section-title" style="margin-top:14px">Products Accepted</div>
+    <div class="mill-form-products" id="mill-product-checklist"></div>
+    <div id="mill-price-section"></div>
+    <div id="m-edit-id" style="display:none"></div>
+    <div id="m-airtable-id" style="display:none"></div>
+    <div class="btn-row">
+      <button class="btn btn-primary" onclick="saveMill()">Save Mill</button>
+      <button class="btn btn-ghost" onclick="clearMillForm()">Clear</button>
+    </div>
+  </div>
+  <div class="section-title">Mill Database</div>
+  <div class="toolbar">
+    <input class="search-bar" id="mill-search" placeholder="Search mills..." oninput="renderMills()">
+    <span id="mill-count" style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--muted);margin-left:auto"></span>
+  </div>
+  <div class="mill-grid" id="mills-grid"><div class="loading-state" style="grid-column:1/-1">Loading mills...</div></div>
+</div>
+
+<!-- ===== MATCHING ===== -->
+<div id="tab-matching" class="panel">
+  <div class="card">
+    <div class="card-title"><span class="dot"></span>Mill Matching Parameters</div>
+    <div class="form-grid">
+      <div class="form-group"><label>Filter by Harvest</label>
+        <select id="match-harvest" class="harvest-select" onchange="runMatching()"><option value="">All Harvests</option></select>
+      </div>
+      <div class="form-group"><label>Filter by Product</label>
+        <select id="match-product" class="harvest-select" onchange="runMatching()"><option value="">All Products</option></select>
+      </div>
+      <div class="form-group"><label>Max Road Distance (mi)</label>
+        <input type="number" id="match-maxdist" value="150" oninput="runMatching()">
+      </div>
+      <div class="form-group"><label>Trucking Rate ($/loaded mile)</label>
+        <input type="number" id="match-truckrate" value="4.50" step="0.25" min="0.50" oninput="runMatching()">
+      </div>
+    </div>
+    <p class="note-text">Ranking by net revenue = mill price &minus; (trucking rate &times; road miles). Road miles via OSRM open-source routing (no API key). Green badge = road miles; amber = straight-line &times; 1.3 fallback. Distances cached after first lookup.</p>
+  </div>
+  <div id="matching-results"></div>
+</div>
+
+</div><!-- /main -->
+
+<!-- DETAIL MODAL -->
+<div class="modal-overlay" id="detail-modal" style="display:none" onclick="closeModal(event)">
+  <div class="modal">
+    <div class="modal-header"><h3 id="modal-title">Harvest Detail</h3>
+      <button class="modal-close" onclick="document.getElementById('detail-modal').style.display='none'">&#x2715;</button>
+    </div>
+    <div class="modal-body" id="modal-body"></div>
+  </div>
+</div>
+<div id="toast"></div>
+
+<script>
+// ============================================================
+// *** CONFIGURATION — FILL THESE IN ***
+// ============================================================
+// 1. Create a Personal Access Token at https://airtable.com/create/tokens
+//    Scopes needed: data.records:read  data.records:write
+//    Access: your "NEFF Wood Products" base only
+// 2. Paste it below (keep the quotes)
+// 3. Paste your Base ID below — it's in the URL when you open your base:
+//    https://airtable.com/appXXXXXXXXXXXXXX/...  ← that part
+const AIRTABLE_TOKEN = 'pat0iWC338OPTbkOm.b3aac17f3710e25259ce3c4c168e583a856defae119070d798455d284f0ca97f';
+const AIRTABLE_BASE  = 'appOz4S4xetLHykr5';
+// ============================================================
+
+const AT_CONFIGURED = AIRTABLE_TOKEN !== 'YOUR_AIRTABLE_TOKEN_HERE' && AIRTABLE_BASE !== 'YOUR_BASE_ID_HERE';
+const AT_URL = `https://api.airtable.com/v0/${AIRTABLE_BASE}`;
+const AT_HEADERS = {'Authorization':`Bearer ${AIRTABLE_TOKEN}`,'Content-Type':'application/json'};
+
+// ============================================================
+// CONVERSIONS
+// 1 cord = 500 BF = 0.5 MBF  →  1 MBF = 2 cords
+// 1 cord = 2.6 tons            →  1 ton = 1/2.6 cords
+// ============================================================
+function toCords(vol, unit){
+  if(!vol||isNaN(vol))return 0;
+  if(unit==='cords')return vol;
+  if(unit==='tons') return vol/2.6;
+  if(unit==='MBF')  return vol*2;
+  return vol;
+}
+
+// ============================================================
+// PRODUCT DEFINITIONS
+// ============================================================
+const PRODUCT_DEFS=[
+  {cat:"Pulp & Fiber",products:[
+    {name:"Hardwood pulp",   unit:"cords",unitType:"cord"},
+    {name:"White pine pulp", unit:"cords",unitType:"cord"},
+    {name:"Spr/fir pulp",    unit:"cords",unitType:"cord"},
+    {name:"Hemlock pulp",    unit:"cords",unitType:"cord"},
+    {name:"Poplar hygrade",  unit:"cords",unitType:"cord"},
+    {name:"Biomass",         unit:"tons", unitType:"ton"},
+    {name:"Firewood",        unit:"cords",unitType:"cord"},
+  ]},
+  {cat:"Softwood Lumber",products:[
+    {name:"White pine select",unit:"MBF",unitType:"mbf"},
+    {name:"White pine #1",    unit:"MBF",unitType:"mbf"},
+    {name:"White pine #2",    unit:"MBF",unitType:"mbf"},
+    {name:"White pine #3",    unit:"MBF",unitType:"mbf"},
+    {name:"White pine pallet",unit:"MBF",unitType:"mbf"},
+    {name:"Red pine sawlogs", unit:"MBF",unitType:"mbf"},
+    {name:"Red pine poles",   unit:"MBF",unitType:"mbf"},
+    {name:"Hemlock logs",     unit:"MBF",unitType:"mbf"},
+    {name:"Cedar hygrade",    unit:"cords",unitType:"cord"},
+  ]},
+  {cat:"Logs by Weight",products:[
+    {name:"Pallet logs by weight",  unit:"tons",unitType:"ton"},
+    {name:"Spruce logs by weight",  unit:"tons",unitType:"ton"},
+    {name:"Fir logs by weight",     unit:"tons",unitType:"ton"},
+    {name:"Birch boltwood",         unit:"cords",unitType:"cord"},
+  ]},
+  {cat:"Hard Maple",products:[
+    {name:"Hard maple veneer", unit:"MBF",unitType:"mbf"},
+    {name:"Hard maple prime",  unit:"MBF",unitType:"mbf"},
+    {name:"Hard maple select", unit:"MBF",unitType:"mbf"},
+    {name:"Hard maple #1",     unit:"MBF",unitType:"mbf"},
+    {name:"Hard maple #2",     unit:"MBF",unitType:"mbf"},
+    {name:"Hard maple pallet", unit:"MBF",unitType:"mbf"},
+  ]},
+  {cat:"Yellow Birch",products:[
+    {name:"Yellow birch veneer", unit:"MBF",unitType:"mbf"},
+    {name:"Yellow birch prime",  unit:"MBF",unitType:"mbf"},
+    {name:"Yellow birch select", unit:"MBF",unitType:"mbf"},
+    {name:"Yellow birch #1",     unit:"MBF",unitType:"mbf"},
+    {name:"Yellow birch #2",     unit:"MBF",unitType:"mbf"},
+    {name:"Yellow birch pallet", unit:"MBF",unitType:"mbf"},
+  ]},
+  {cat:"White / Black Birch",products:[
+    {name:"White birch sawlog",unit:"MBF",unitType:"mbf"},
+    {name:"Black birch sawlog",unit:"MBF",unitType:"mbf"},
+  ]},
+  {cat:"Soft Maple",products:[
+    {name:"Soft maple prime",  unit:"MBF",unitType:"mbf"},
+    {name:"Soft maple select", unit:"MBF",unitType:"mbf"},
+    {name:"Soft maple #1",     unit:"MBF",unitType:"mbf"},
+    {name:"Soft maple #2",     unit:"MBF",unitType:"mbf"},
+    {name:"Soft maple pallet", unit:"MBF",unitType:"mbf"},
+  ]},
+  {cat:"White Ash",products:[
+    {name:"White ash veneer", unit:"MBF",unitType:"mbf"},
+    {name:"White ash prime",  unit:"MBF",unitType:"mbf"},
+    {name:"White ash select", unit:"MBF",unitType:"mbf"},
+    {name:"White ash #1",     unit:"MBF",unitType:"mbf"},
+    {name:"White ash #2",     unit:"MBF",unitType:"mbf"},
+    {name:"White ash pallet", unit:"MBF",unitType:"mbf"},
+  ]},
+  {cat:"Red Oak",products:[
+    {name:"Red oak veneer", unit:"MBF",unitType:"mbf"},
+    {name:"Red oak prime",  unit:"MBF",unitType:"mbf"},
+    {name:"Red oak select", unit:"MBF",unitType:"mbf"},
+    {name:"Red oak #1",     unit:"MBF",unitType:"mbf"},
+    {name:"Red oak #2",     unit:"MBF",unitType:"mbf"},
+    {name:"Red oak pallet", unit:"MBF",unitType:"mbf"},
+  ]},
+];
+const ALL_PRODUCTS = PRODUCT_DEFS.flatMap(c=>c.products.map(p=>({...p,cat:c.cat})));
+const UNIT_OPTIONS = {cord:['cords','tons'], ton:['tons','cords'], mbf:['MBF']};
+
+// ============================================================
+// LOCAL FALLBACK STORAGE (used when Airtable not configured)
+// ============================================================
+function lsLoad(k,d){try{const v=localStorage.getItem(k);return v?JSON.parse(v):d;}catch{return d;}}
+function lsSave(k,v){try{localStorage.setItem(k,JSON.stringify(v));}catch{}}
+
+let submissions = [];  // loaded from Airtable or localStorage
+let mills = [];        // loaded from Airtable or localStorage
+let distCache = lsLoad('neff_dc',{});
+
+// ============================================================
+// AIRTABLE API
+// ============================================================
+async function atFetch(table, opts={}){
+  const url = new URL(`${AT_URL}/${encodeURIComponent(table)}`);
+  if(opts.params) Object.entries(opts.params).forEach(([k,v])=>url.searchParams.set(k,v));
+  const resp = await fetch(url, {headers:AT_HEADERS});
+  if(!resp.ok) throw new Error(`Airtable ${resp.status}: ${await resp.text()}`);
+  return resp.json();
+}
+
+async function atCreate(table, fields){
+  const resp = await fetch(`${AT_URL}/${encodeURIComponent(table)}`,{
+    method:'POST', headers:AT_HEADERS,
+    body: JSON.stringify({records:[{fields}]})
+  });
+  if(!resp.ok) throw new Error(`Airtable ${resp.status}: ${await resp.text()}`);
+  return resp.json();
+}
+
+async function atUpdate(table, recordId, fields){
+  const resp = await fetch(`${AT_URL}/${encodeURIComponent(table)}/${recordId}`,{
+    method:'PATCH', headers:AT_HEADERS,
+    body: JSON.stringify({fields})
+  });
+  if(!resp.ok) throw new Error(`Airtable ${resp.status}: ${await resp.text()}`);
+  return resp.json();
+}
+
+async function atDelete(table, recordId){
+  const resp = await fetch(`${AT_URL}/${encodeURIComponent(table)}/${recordId}`,{
+    method:'DELETE', headers:AT_HEADERS
+  });
+  if(!resp.ok) throw new Error(`Airtable ${resp.status}: ${await resp.text()}`);
+  return resp.json();
+}
+
+// Fetch all pages from Airtable (handles >100 records)
+async function atFetchAll(table){
+  let records=[], offset=null;
+  do {
+    const params = offset ? {offset} : {};
+    const data = await atFetch(table, {params});
+    records = records.concat(data.records||[]);
+    offset = data.offset||null;
+  } while(offset);
+  return records;
+}
+
+// ============================================================
+// LOAD DATA
+// ============================================================
+async function loadAll(){
+  setConn('loading','connecting...');
+  if(!AT_CONFIGURED){
+    document.getElementById('config-warn').style.display='block';
+    submissions = lsLoad('neff_subs3',[]);
+    mills = lsLoad('neff_mills3',null);
+    if(!mills){mills=defaultMills();lsSave('neff_mills3',mills);}
+    setConn('err','local mode (not configured)');
+    return;
+  }
+  try{
+    const [subRecs, millRecs] = await Promise.all([
+      atFetchAll('Harvests'),
+      atFetchAll('Mills')
+    ]);
+    submissions = subRecs.map(r=>({
+      _atId: r.id,
+      id:    r.fields.id || r.id,
+      woodlot:  r.fields.woodlot  || '',
+      state:    r.fields.state    || '',
+      forester: r.fields.forester || '',
+      location: r.fields.location || '',
+      lat:  parseFloat(r.fields.lat)  || null,
+      lng:  parseFloat(r.fields.lng)  || null,
+      acres:parseFloat(r.fields.acres)|| null,
+      system: r.fields.system  || '',
+      timing: r.fields.timing  || '',
+      date:   r.fields.date    || '',
+      products: r.fields.products_json ? JSON.parse(r.fields.products_json) : {}
+    }));
+    mills = millRecs.map(r=>({
+      _atId:    r.id,
+      id:       r.fields.id || r.id,
+      name:     r.fields.name     || '',
+      state:    r.fields.state    || '',
+      town:     r.fields.town     || '',
+      lat:  parseFloat(r.fields.lat)  || null,
+      lng:  parseFloat(r.fields.lng)  || null,
+      contact:  r.fields.contact  || '',
+      products: r.fields.products_json ? JSON.parse(r.fields.products_json) : [],
+      prices:   r.fields.prices_json  ? JSON.parse(r.fields.prices_json)   : {},
+    }));
+    if(!mills.length){
+      // Seed default mills on first run
+      await seedDefaultMills();
+    }
+    setConn('ok','connected to Airtable');
+  }catch(e){
+    console.error(e);
+    setConn('err','Airtable error — check token/base ID');
+    showToast('Airtable connection failed','error');
+    // Fall back to localStorage so UI still works
+    submissions = lsLoad('neff_subs3',[]);
+    mills = lsLoad('neff_mills3',null)||defaultMills();
+  }
+}
+
+function setConn(state,label){
+  const dot=document.getElementById('conn-dot');
+  const lbl=document.getElementById('conn-label');
+  dot.className='conn-dot '+state;
+  lbl.textContent=label;
+}
+
+async function seedDefaultMills(){
+  const defs = defaultMills();
+  for(const m of defs){
+    const fields = millToFields(m);
+    const result = await atCreate('Mills', fields);
+    m._atId = result.records[0].id;
+  }
+  mills = defs;
+}
+
+// ============================================================
+// DEFAULT MILLS
+// ============================================================
+function defaultMills(){return[
+  {id:'m1',name:'Sappi Skowhegan',state:'ME',town:'Skowhegan, ME',lat:44.769,lng:-69.719,contact:'207-474-4000',products:['Hardwood pulp','White pine pulp','Spr/fir pulp','Hemlock pulp','Biomass'],prices:{'Hardwood pulp':35,'White pine pulp':30,'Spr/fir pulp':32,'Hemlock pulp':28,'Biomass':18}},
+  {id:'m2',name:'ND Paper (Rumford)',state:'ME',town:'Rumford, ME',lat:44.555,lng:-70.551,contact:'207-369-2211',products:['Hardwood pulp','Spr/fir pulp','White pine pulp'],prices:{'Hardwood pulp':33,'Spr/fir pulp':30,'White pine pulp':28}},
+  {id:'m3',name:'Robbins Lumber (Searsmont)',state:'ME',town:'Searsmont, ME',lat:44.315,lng:-69.175,contact:'207-342-5221',products:['White pine select','White pine #1','White pine #2','White pine #3','White pine pallet'],prices:{'White pine select':380,'White pine #1':340,'White pine #2':290,'White pine #3':230,'White pine pallet':180}},
+  {id:'m4',name:'Robbins Lumber (Sanford)',state:'ME',town:'Sanford, ME',lat:43.437,lng:-70.774,contact:'207-342-5221',products:['White pine select','White pine #1','White pine #2','White pine #3','White pine pallet'],prices:{'White pine select':370,'White pine #1':330,'White pine #2':280,'White pine #3':220,'White pine pallet':175}},
+  {id:'m5',name:'Pleasant River Lumber (Dover-Foxcroft)',state:'ME',town:'Dover-Foxcroft, ME',lat:45.183,lng:-69.223,contact:'',products:['Spr/fir pulp','White pine pulp','White pine select','White pine #1','White pine #2'],prices:{'Spr/fir pulp':29,'White pine pulp':28,'White pine select':360,'White pine #1':320,'White pine #2':265}},
+  {id:'m6',name:'Cersosimo Lumber',state:'VT',town:'Brattleboro, VT',lat:42.851,lng:-72.558,contact:'802-254-4508',products:['Hard maple veneer','Hard maple prime','Hard maple select','Hard maple #1','Hard maple #2','Yellow birch prime','Yellow birch select','Yellow birch #1','Soft maple prime','Soft maple select','Red oak prime','Red oak select','White ash prime','White ash select'],prices:{'Hard maple veneer':920,'Hard maple prime':560,'Hard maple select':430,'Hard maple #1':350,'Hard maple #2':270,'Yellow birch prime':490,'Yellow birch select':380,'Yellow birch #1':290,'Soft maple prime':300,'Soft maple select':240,'Red oak prime':520,'Red oak select':400,'White ash prime':380,'White ash select':300}},
+  {id:'m7',name:'Allard Lumber',state:'VT',town:'Townshend, VT',lat:43.050,lng:-72.683,contact:'',products:['Hard maple prime','Hard maple select','Hard maple #1','Yellow birch prime','Yellow birch select','Soft maple prime','Soft maple select','White ash prime','White ash select','Red oak prime','Red oak select'],prices:{'Hard maple prime':540,'Hard maple select':415,'Hard maple #1':335,'Yellow birch prime':470,'Yellow birch select':365,'Soft maple prime':285,'Soft maple select':230,'White ash prime':365,'White ash select':285,'Red oak prime':500,'Red oak select':385}},
+  {id:'m8',name:'ReEnergy Stratton',state:'ME',town:'Stratton, ME',lat:45.114,lng:-70.436,contact:'',products:['Biomass'],prices:{'Biomass':24}},
+  {id:'m9',name:'ReEnergy Livermore Falls',state:'ME',town:'Livermore Falls, ME',lat:44.355,lng:-70.187,contact:'',products:['Biomass'],prices:{'Biomass':23}},
+  {id:'m10',name:'McNeil Generating Station',state:'VT',town:'Burlington, VT',lat:44.476,lng:-73.212,contact:'802-865-7300',products:['Biomass'],prices:{'Biomass':22}},
+  {id:'m11',name:'Columbia Forest Products',state:'VT',town:'Hearst, VT',lat:44.419,lng:-72.016,contact:'',products:['Hard maple veneer','Yellow birch veneer','White ash veneer','Red oak veneer'],prices:{'Hard maple veneer':950,'Yellow birch veneer':880,'White ash veneer':820,'Red oak veneer':780}},
+  {id:'m12',name:'Hull Forest Products',state:'CT',town:'Pomfret, CT',lat:41.889,lng:-71.971,contact:'',products:['Hard maple veneer','Hard maple prime','Hard maple select','Yellow birch veneer','Yellow birch prime','White ash veneer','White ash prime','Red oak veneer','Red oak prime','Soft maple prime'],prices:{'Hard maple veneer':900,'Hard maple prime':520,'Hard maple select':400,'Yellow birch veneer':830,'Yellow birch prime':430,'White ash veneer':800,'White ash prime':370,'Red oak veneer':760,'Red oak prime':490,'Soft maple prime':280}},
+];}
+
+// ============================================================
+// PHOTON ADDRESS AUTOCOMPLETE
+// ============================================================
+let acDebounce = null;
+let selectedLocation = null; // {lat, lng, display}
+
+function onLocationInput(){
+  const val = document.getElementById('f-location').value.trim();
+  // Clear confirmed location if user types again
+  if(selectedLocation && val !== selectedLocation.display){
+    selectedLocation = null;
+    document.getElementById('f-lat').value = '';
+    document.getElementById('f-lng').value = '';
+    document.getElementById('f-location').classList.remove('location-confirmed');
+    setLocStatus('','');
+  }
+  clearTimeout(acDebounce);
+  if(val.length < 2){closeDropdown();return;}
+  acDebounce = setTimeout(()=>fetchSuggestions(val), 300);
+}
+
+async function fetchSuggestions(query){
+  setLocStatus('searching','searching...');
+  try{
+    // Bias results to northeastern US
+    const url = `https://photon.komoot.io/api/?q=${encodeURIComponent(query)}&limit=6&bbox=-73.7,41.0,-66.9,47.5&lang=en`;
+    const resp = await fetch(url);
+    const data = await resp.json();
+    renderDropdown(data.features || []);
+  }catch(e){
+    setLocStatus('err','search unavailable');
+    closeDropdown();
+  }
+}
+
+function renderDropdown(features){
+  const dd = document.getElementById('ac-dropdown');
+  if(!features.length){dd.style.display='none';setLocStatus('','');return;}
+  dd.innerHTML = features.map((f,i)=>{
+    const p = f.properties;
+    const main = [p.name, p.street].filter(Boolean).join(', ') || p.city || p.county || 'Unknown';
+    const sub  = [p.city, p.state, p.country].filter(Boolean).join(', ');
+    const type = p.type || p.osm_value || '';
+    return `<div class="ac-item" onclick="selectLocation(${i})">
+      <span class="ac-main">${main}</span>
+      <span class="ac-sub">${sub}</span>
+      ${type?`<span class="ac-badge">${type}</span>`:''}
+    </div>`;
+  }).join('');
+  dd._features = features;
+  dd.style.display = 'block';
+  setLocStatus('','');
+}
+
+function selectLocation(idx){
+  const dd = document.getElementById('ac-dropdown');
+  const f  = dd._features[idx];
+  const p  = f.properties;
+  const [lng, lat] = f.geometry.coordinates;
+  const main = [p.name, p.street].filter(Boolean).join(', ') || p.city || '';
+  const sub  = [p.city, p.state].filter(Boolean).join(', ');
+  const display = [main, sub].filter(Boolean).join(' — ');
+
+  selectedLocation = {lat, lng, display};
+  document.getElementById('f-location').value = display;
+  document.getElementById('f-location').classList.add('location-confirmed');
+  document.getElementById('f-lat').value = lat;
+  document.getElementById('f-lng').value = lng;
+  document.getElementById('f-location-display').value = display;
+  setLocStatus('ok', `&#10003; ${lat.toFixed(4)}, ${lng.toFixed(4)}`);
+  closeDropdown();
+}
+
+function closeDropdown(){
+  const dd = document.getElementById('ac-dropdown');
+  dd.style.display = 'none';
+}
+
+function setLocStatus(cls, msg){
+  const el = document.getElementById('location-status');
+  el.className = 'location-status' + (cls?' '+cls:'');
+  el.innerHTML = msg;
+}
+
+// Close dropdown on outside click
+document.addEventListener('click', e=>{
+  if(!document.getElementById('location-group').contains(e.target)) closeDropdown();
+});
+
+// ============================================================
+// BUILD PRODUCT TABLE
+// ============================================================
+function buildProductTable(){
+  const tbody = document.getElementById('products-tbody');
+  tbody.innerHTML = '';
+  PRODUCT_DEFS.forEach(cat=>{
+    const htr = document.createElement('tr');
+    htr.className = 'product-category';
+    htr.innerHTML = '<td colspan="4">'+cat.cat+'</td>';
+    tbody.appendChild(htr);
+    cat.products.forEach(p=>{
+      const pid  = p.name.replace(/[^a-z0-9]/gi,'_');
+      const opts = UNIT_OPTIONS[p.unitType]||['cords'];
+      const unitCell = opts.length===1
+        ? '<span class="unit-label">'+opts[0]+'</span>'
+        : '<select class="unit-select" id="unit_'+pid+'" onchange="updateSummary()">'
+            +opts.map(u=>'<option value="'+u+'"'+(u===p.unit?' selected':'')+'>'+u+'</option>').join('')
+            +'</select>';
+      const tr = document.createElement('tr');
+      tr.innerHTML = '<td>'+p.name+'</td>'
+        +'<td><input type="number" class="vol-input" id="vol_'+pid+'" min="0" step="0.1" placeholder="" oninput="updateSummary()"></td>'
+        +'<td>'+unitCell+'</td>'
+        +'<td><input type="text" style="width:100%;padding:3px 6px;border:1px solid var(--border);border-radius:2px;font-size:11px;background:var(--white)" id="note_'+pid+'" placeholder=""></td>';
+      tbody.appendChild(tr);
+    });
+  });
+}
+
+// ============================================================
+// RUNNING SUMMARY
+// ============================================================
+function updateSummary(){
+  let cords=0,mbf=0,tons=0,count=0;
+  const byCat={};
+  ALL_PRODUCTS.forEach(p=>{
+    const pid = p.name.replace(/[^a-z0-9]/gi,'_');
+    const raw = parseFloat(document.getElementById('vol_'+pid)?.value);
+    if(isNaN(raw)||raw<=0)return;
+    count++;
+    const unitEl = document.getElementById('unit_'+pid);
+    const unit   = unitEl ? unitEl.value : p.unit;
+    if(unit==='cords')     cords+=raw;
+    else if(unit==='tons'){cords+=raw/2.6;tons+=raw;}
+    else if(unit==='MBF')  mbf+=raw;
+    const ce = toCords(raw,unit);
+    byCat[p.cat] = (byCat[p.cat]||0)+ce;
+  });
+  document.getElementById('rs-count').textContent = count;
+  document.getElementById('rs-cords').textContent = cords>0?cords.toFixed(1):'—';
+  document.getElementById('rs-mbf').textContent   = mbf>0?mbf.toFixed(2):'—';
+  document.getElementById('rs-tons').textContent  = tons>0?tons.toFixed(1):'—';
+  const acres = parseFloat(document.getElementById('f-acres').value);
+  const allCe = cords + mbf*2;
+  const iBox  = document.getElementById('rs-intensity-box');
+  if(acres>0&&allCe>0){
+    iBox.style.display='block';
+    document.getElementById('rs-intensity-val').textContent=(allCe/acres).toFixed(1);
+  }else{iBox.style.display='none';}
+  document.getElementById('rs-by-cat').innerHTML = Object.keys(byCat).length
+    ? Object.entries(byCat).map(([cat,ce])=>
+        '<div class="sp-line"><span style="color:var(--muted)">'+cat+'</span><span class="sp-lv">'+ce.toFixed(1)+' cords</span></div>'
+      ).join('')
+    : '<div style="font-size:10px;color:var(--muted)">No volumes entered yet</div>';
+}
+
+// ============================================================
+// SUBMIT HARVEST
+// ============================================================
+function uid(){return Date.now().toString(36)+Math.random().toString(36).slice(2,5);}
+
+async function submitHarvest(){
+  const woodlot  = document.getElementById('f-woodlot').value.trim();
+  const forester = document.getElementById('f-forester').value.trim();
+  if(!woodlot||!forester){showToast('Enter woodlot name and forester name','error');return;}
+
+  const lat = parseFloat(document.getElementById('f-lat').value);
+  const lng = parseFloat(document.getElementById('f-lng').value);
+  const locationDisplay = document.getElementById('f-location').value.trim();
+
+  const products={};
+  ALL_PRODUCTS.forEach(p=>{
+    const pid = p.name.replace(/[^a-z0-9]/gi,'_');
+    let raw   = parseFloat(document.getElementById('vol_'+pid)?.value);
+    if(isNaN(raw)||raw<=0)return;
+    const unitEl = document.getElementById('unit_'+pid);
+    let unit = unitEl ? unitEl.value : p.unit;
+    const note = document.getElementById('note_'+pid)?.value||'';
+    if(unit==='tons'){raw=parseFloat((raw/2.6).toFixed(3));unit='cords';}
+    products[p.name]={vol:raw,unit,note};
+  });
+  if(!Object.keys(products).length){showToast('Enter at least one product volume','error');return;}
+
+  const rec = {
+    id: uid(),
+    woodlot, state: document.getElementById('f-state').value, forester,
+    location: locationDisplay,
+    lat:  isNaN(lat)?null:lat,
+    lng:  isNaN(lng)?null:lng,
+    acres: parseFloat(document.getElementById('f-acres').value)||null,
+    system: document.getElementById('f-system').value,
+    timing: document.getElementById('f-timing').value,
+    date: new Date().toLocaleDateString(),
+    products
+  };
+
+  const btn = document.getElementById('submit-btn');
+  btn.disabled=true; btn.textContent='Saving...';
+
+  try{
+    if(AT_CONFIGURED){
+      const result = await atCreate('Harvests', harvestToFields(rec));
+      rec._atId = result.records[0].id;
+    } else {
+      lsSave('neff_subs3',[...submissions,rec]);
+    }
+    submissions.push(rec);
+    clearForm();
+    showToast('Submitted: '+woodlot);
+  }catch(e){
+    showToast('Save failed — check connection','error');
+    console.error(e);
+  }finally{
+    btn.disabled=false; btn.textContent='Submit Harvest Data';
+  }
+}
+
+function harvestToFields(r){
+  return {
+    id: r.id, woodlot:r.woodlot, state:r.state, forester:r.forester,
+    location:r.location||'',
+    lat:  r.lat||null, lng: r.lng||null,
+    acres:r.acres||null, system:r.system||'', timing:r.timing||'', date:r.date,
+    products_json: JSON.stringify(r.products)
+  };
+}
+
+function millToFields(m){
+  return {
+    id:m.id||uid(), name:m.name, state:m.state||'', town:m.town||'',
+    lat:m.lat||null, lng:m.lng||null, contact:m.contact||'',
+    products_json: JSON.stringify(m.products),
+    prices_json:   JSON.stringify(m.prices),
+  };
+}
+
+function clearForm(){
+  ['f-woodlot','f-location','f-lat','f-lng','f-location-display','f-acres','f-timing','f-forester'].forEach(id=>{
+    const el=document.getElementById(id); if(el)el.value='';
+  });
+  document.getElementById('f-state').value='';
+  document.getElementById('f-system').value='';
+  document.getElementById('f-location').classList.remove('location-confirmed');
+  selectedLocation=null;
+  setLocStatus('','');
+  closeDropdown();
+  ALL_PRODUCTS.forEach(p=>{
+    const pid=p.name.replace(/[^a-z0-9]/gi,'_');
+    const v=document.getElementById('vol_'+pid); if(v)v.value='';
+    const n=document.getElementById('note_'+pid); if(n)n.value='';
+  });
+  updateSummary();
+}
+
+// ============================================================
+// SUBMISSIONS TAB
+// ============================================================
+function renderSubmissions(){
+  const q  = (document.getElementById('sub-search').value||'').toLowerCase();
+  const rf = document.getElementById('sub-region-filter').value;
+  const list = submissions.filter(s=>
+    (!rf||s.state===rf)&&
+    (!q||s.woodlot.toLowerCase().includes(q)||s.forester.toLowerCase().includes(q)||(s.state||'').toLowerCase().includes(q)||(s.location||'').toLowerCase().includes(q))
+  );
+  document.getElementById('sub-count').textContent=list.length+' harvest'+(list.length!==1?'s':'');
+  const el=document.getElementById('submissions-list');
+  if(!list.length){el.innerHTML='<div class="empty-state">No submissions yet.</div>';return;}
+  el.innerHTML=list.sort((a,b)=>b.date.localeCompare(a.date)).map(s=>{
+    const pc    = Object.keys(s.products).length;
+    const allCe = Object.values(s.products).reduce((a,{vol,unit})=>a+toCords(vol,unit),0);
+    const intensity = s.acres&&allCe?(allCe/s.acres).toFixed(1)+' cd/ac':'';
+    const tags  = Object.keys(s.products).slice(0,5).map(k=>'<span class="sub-prod-tag">'+k+': '+s.products[k].vol.toFixed(2)+' '+s.products[k].unit+'</span>').join('');
+    const more  = pc>5?'<span class="sub-prod-tag">+'+(pc-5)+' more</span>':'';
+    const locStr = s.location || (s.lat&&s.lng?s.lat.toFixed(4)+', '+s.lng.toFixed(4):'No location');
+    return '<div class="submission-item"><div style="flex:1">'
+      +'<div style="display:flex;align-items:center;gap:8px">'
+      +'<span class="sub-title">'+s.woodlot+'</span>'
+      +'<span class="region-badge region-'+(s.state||'NA')+'">'+(s.state||'?')+'</span>'
+      +(intensity?'<span style="font-family:\'IBM Plex Mono\',monospace;font-size:9px;background:var(--parchment);padding:1px 6px;border-radius:2px;color:var(--bark)">'+intensity+'</span>':'')
+      +'</div>'
+      +'<div class="sub-meta">'
+      +'<span>&#128205; '+locStr+'</span>'
+      +(s.acres?'<span>'+s.acres+' ac</span>':'')
+      +'<span>'+(s.system||'system TBD')+'</span>'
+      +'<span>'+(s.timing||'timing TBD')+'</span>'
+      +'<span>'+(s.forester||'—')+'</span>'
+      +'<span>'+s.date+'</span>'
+      +'<span>'+pc+' products</span>'
+      +'</div>'
+      +'<div class="sub-products-preview">'+tags+more+'</div>'
+      +'</div><div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px">'
+      +'<button class="delete-sub-btn" onclick="deleteSub(\''+s.id+'\')">&#x2715;</button>'
+      +'<button class="view-sub-btn" onclick="openDetail(\''+s.id+'\')">View detail</button>'
+      +'</div></div>';
+  }).join('');
+}
+
+async function deleteSub(id){
+  if(!confirm('Delete this submission?'))return;
+  const s = submissions.find(x=>x.id===id);
+  if(AT_CONFIGURED && s?._atId){
+    try{await atDelete('Harvests',s._atId);}catch(e){showToast('Delete failed','error');return;}
+  }
+  submissions = submissions.filter(s=>s.id!==id);
+  if(!AT_CONFIGURED) lsSave('neff_subs3',submissions);
+  renderSubmissions();
+  showToast('Deleted');
+}
+
+function openDetail(id){
+  const s=submissions.find(x=>x.id===id); if(!s)return;
+  const allCe=Object.values(s.products).reduce((a,{vol,unit})=>a+toCords(vol,unit),0);
+  const intensity=s.acres&&allCe?(allCe/s.acres).toFixed(2)+' cords/ac':'—';
+  const locStr=s.location||(s.lat&&s.lng?s.lat.toFixed(5)+', '+s.lng.toFixed(5):'No location');
+  let h='<div class="detail-grid">'
+    +'<div><div class="detail-label">State</div><div class="detail-value"><span class="region-badge region-'+(s.state||'NA')+'">'+(s.state||'?')+'</span></div></div>'
+    +'<div><div class="detail-label">Harvest System</div><div class="detail-value">'+(s.system||'—')+'</div></div>'
+    +'<div><div class="detail-label">Location</div><div class="detail-value">'+locStr
+    +(s.lat&&s.lng?'<br><a class="harvest-map-link" href="https://maps.google.com/?q='+s.lat+','+s.lng+'" target="_blank">View on Google Maps &rarr;</a>':'')
+    +'</div></div>'
+    +'<div><div class="detail-label">Delivery Window</div><div class="detail-value">'+(s.timing||'—')+'</div></div>'
+    +'<div><div class="detail-label">Forester</div><div class="detail-value">'+(s.forester||'—')+'</div></div>'
+    +'<div><div class="detail-label">Harvest Acreage</div><div class="detail-value">'+(s.acres?s.acres+' ac':'—')+'</div></div>'
+    +'<div><div class="detail-label">Removal Intensity</div><div class="detail-value" style="font-family:\'IBM Plex Mono\',monospace;font-weight:600;color:var(--pine)">'+intensity+'</div></div>'
+    +'<div><div class="detail-label">Submitted</div><div class="detail-value">'+s.date+'</div></div>'
+    +'</div>';
+  h+='<div class="section-title">Products</div>'
+    +'<table class="products-table" style="background:var(--white)"><thead>'
+    +'<tr><th>Product</th><th style="text-align:right">Volume</th><th>Unit</th><th style="text-align:right">Cords equiv.</th><th>Note</th></tr>'
+    +'</thead><tbody>';
+  Object.entries(s.products).forEach(([n,{vol,unit,note}])=>{
+    const ce=toCords(vol,unit);
+    h+='<tr><td>'+n+'</td>'
+      +'<td style="font-family:\'IBM Plex Mono\',monospace;text-align:right">'+vol.toFixed(2)+'</td>'
+      +'<td class="unit-label">'+unit+'</td>'
+      +'<td style="font-family:\'IBM Plex Mono\',monospace;text-align:right;color:var(--muted)">'+ce.toFixed(2)+'</td>'
+      +'<td style="font-size:11px;color:var(--muted)">'+(note||'')+'</td></tr>';
+  });
+  h+='<tr style="font-weight:600;background:var(--parchment)">'
+    +'<td colspan="3">Total cords equivalent</td>'
+    +'<td style="font-family:\'IBM Plex Mono\',monospace;text-align:right">'+allCe.toFixed(2)+'</td>'
+    +'<td></td></tr></tbody></table>';
+  document.getElementById('modal-title').textContent=s.woodlot+' — Detail';
+  document.getElementById('modal-body').innerHTML=h;
+  document.getElementById('detail-modal').style.display='flex';
+}
+function closeModal(e){if(e.target===document.getElementById('detail-modal'))document.getElementById('detail-modal').style.display='none';}
+
+// ============================================================
+// DASHBOARD
+// ============================================================
+function renderDashboard(){
+  const regions=['ME','NH','MA','VT','CT'];
+  const rd={};regions.forEach(r=>rd[r]={harvests:[],products:{}});rd.NA={harvests:[],products:{}};
+  submissions.forEach(s=>{
+    const r=regions.includes(s.state)?s.state:'NA';
+    rd[r].harvests.push(s);
+    Object.entries(s.products).forEach(([n,{vol,unit}])=>{
+      if(!rd[r].products[n])rd[r].products[n]={vol:0,unit};
+      rd[r].products[n].vol+=vol;
+    });
+  });
+  const totalAcres = submissions.reduce((a,s)=>a+(s.acres||0),0);
+  const totalCe    = submissions.reduce((a,s)=>a+Object.values(s.products).reduce((b,{vol,unit})=>b+toCords(vol,unit),0),0);
+  const intensity  = totalAcres>0?(totalCe/totalAcres).toFixed(1):'—';
+  document.getElementById('dash-stats').innerHTML=
+    '<div class="stat-box"><div class="sv">'+submissions.length+'</div><div class="sl">Harvests</div></div>'
+    +'<div class="stat-box"><div class="sv">'+Object.entries(rd).filter(([,d])=>d.harvests.length>0).length+'</div><div class="sl">Regions Active</div></div>'
+    +'<div class="stat-box"><div class="sv">'+totalCe.toFixed(0)+'</div><div class="sl">Total Cords Equiv.</div></div>'
+    +'<div class="stat-box"><div class="sv">'+intensity+'</div><div class="sl">Cords / Acre</div></div>'
+    +'<div class="stat-box"><div class="sv">'+mills.length+'</div><div class="sl">Mills in DB</div></div>';
+  const allR=[...regions,'NA'].filter(r=>rd[r].harvests.length>0);
+  if(!allR.length){
+    document.getElementById('region-cards').innerHTML='<div class="empty-state" style="grid-column:1/-1">No submissions yet.</div>';
+    document.getElementById('aggregate-table-wrap').innerHTML='';
+    return;
+  }
+  document.getElementById('region-cards').innerHTML=allR.map(r=>{
+    const d=rd[r];
+    const prods=Object.entries(d.products).sort((a,b)=>b[1].vol-a[1].vol);
+    let rows='',lc='';
+    prods.forEach(([n,{vol,unit}])=>{
+      const p=ALL_PRODUCTS.find(x=>x.name===n);
+      const cat=p?p.cat:'Other';
+      if(cat!==lc){rows+='<div class="rp-cat-header">'+cat+'</div>';lc=cat;}
+      rows+='<div class="rp-row"><span>'+n+'</span><span><span class="rp-vol">'+vol.toLocaleString(undefined,{maximumFractionDigits:2})+'</span><span class="rp-unit">'+unit+'</span></span></div>';
+    });
+    return '<div class="region-card"><div class="region-header rh-'+r+'">'
+      +'<div><div class="rh-name">'+r+'</div><div class="rh-sub">'+d.harvests.length+' harvest'+(d.harvests.length!==1?'s':'')+'</div></div>'
+      +'</div><div class="region-products">'+(rows||'<div class="empty-state">No products</div>')+'</div></div>';
+  }).join('');
+  const agg={};
+  submissions.forEach(s=>Object.entries(s.products).forEach(([n,{vol,unit}])=>{
+    if(!agg[n])agg[n]={vol:0,unit,cat:ALL_PRODUCTS.find(x=>x.name===n)?.cat||'Other'};
+    agg[n].vol+=vol;
+  }));
+  const arr=Object.entries(agg).sort((a,b)=>a[1].cat.localeCompare(b[1].cat)||b[1].vol-a[1].vol);
+  if(!arr.length){document.getElementById('aggregate-table-wrap').innerHTML='<div class="empty-state">No product data.</div>';return;}
+  let lc2='';
+  let tbl='<table class="products-table" style="background:var(--white)"><thead><tr><th>Category</th><th>Product</th><th style="text-align:right">Total Volume</th><th>Unit</th><th style="text-align:right">Cords Equiv.</th></tr></thead><tbody>';
+  arr.forEach(([n,{vol,unit,cat}])=>{
+    const ce=toCords(vol,unit);
+    tbl+='<tr><td style="font-size:10px;color:var(--muted);font-family:\'IBM Plex Mono\',monospace">'+(cat!==lc2?(lc2=cat,cat):'')+'</td>'
+      +'<td>'+n+'</td>'
+      +'<td style="font-family:\'IBM Plex Mono\',monospace;text-align:right;font-weight:600">'+vol.toLocaleString(undefined,{maximumFractionDigits:2})+'</td>'
+      +'<td class="unit-label">'+unit+'</td>'
+      +'<td style="font-family:\'IBM Plex Mono\',monospace;text-align:right;color:var(--muted)">'+ce.toFixed(2)+'</td></tr>';
+  });
+  document.getElementById('aggregate-table-wrap').innerHTML=tbl+'</tbody></table>';
+}
+
+// ============================================================
+// MILLS
+// ============================================================
+function buildMillChecklist(){
+  const el=document.getElementById('mill-product-checklist');
+  el.innerHTML='';
+  ALL_PRODUCTS.forEach(p=>{
+    const mid=p.name.replace(/[^a-z0-9]/gi,'_');
+    const lbl=document.createElement('label');
+    lbl.className='mill-product-check';
+    lbl.innerHTML='<input type="checkbox" id="mpc_'+mid+'" value="'+p.name+'" onchange="updateMillPriceSection()"> '+p.name+' <span class="unit-label">('+p.unit+')</span>';
+    el.appendChild(lbl);
+  });
+}
+
+function updateMillPriceSection(){
+  const checked=[...document.querySelectorAll('#mill-product-checklist input:checked')].map(x=>x.value);
+  const sec=document.getElementById('mill-price-section');
+  if(!checked.length){sec.innerHTML='';return;}
+  let html='<div class="section-title" style="margin-top:12px">Mill Prices (per unit)</div>'
+    +'<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:6px;padding:10px;background:var(--parchment);border-radius:3px">';
+  checked.forEach(name=>{
+    const p=ALL_PRODUCTS.find(x=>x.name===name);
+    const mid=name.replace(/[^a-z0-9]/gi,'_');
+    html+='<div style="display:flex;align-items:center;gap:6px;font-size:11px">'
+      +'<span style="flex:1">'+name+'</span>'
+      +'<span class="unit-label">$/'+p.unit+'</span>'
+      +'<input type="number" class="price-input" id="mprice_'+mid+'" min="0" step="0.01" placeholder="0"></div>';
+  });
+  sec.innerHTML=html+'</div>';
+}
+
+async function saveMill(){
+  const name=document.getElementById('m-name').value.trim();
+  if(!name){showToast('Enter mill name','error');return;}
+  const checked=[...document.querySelectorAll('#mill-product-checklist input:checked')].map(x=>x.value);
+  if(!checked.length){showToast('Select at least one product','error');return;}
+  const prices={};
+  checked.forEach(p=>{
+    const mid=p.replace(/[^a-z0-9]/gi,'_');
+    const v=parseFloat(document.getElementById('mprice_'+mid)?.value)||0;
+    if(v>0)prices[p]=v;
+  });
+  const editId  =document.getElementById('m-edit-id').textContent.trim();
+  const atId    =document.getElementById('m-airtable-id').textContent.trim();
+  const mill={
+    id:editId||uid(), _atId:atId||null,
+    name, state:document.getElementById('m-state').value,
+    town:document.getElementById('m-town').value.trim(),
+    lat:parseFloat(document.getElementById('m-lat').value)||null,
+    lng:parseFloat(document.getElementById('m-lng').value)||null,
+    contact:document.getElementById('m-contact').value.trim(),
+    products:checked, prices
+  };
+  try{
+    if(AT_CONFIGURED){
+      if(atId){
+        const r=await atUpdate('Mills',atId,millToFields(mill));
+        mill._atId=r.id;
+      } else {
+        const r=await atCreate('Mills',millToFields(mill));
+        mill._atId=r.records[0].id;
+      }
+    }
+    if(editId) mills=mills.map(m=>m.id===editId?mill:m);
+    else mills.push(mill);
+    if(!AT_CONFIGURED) lsSave('neff_mills3',mills);
+    clearMillForm();renderMills();showToast('Mill saved: '+name);
+  }catch(e){showToast('Save failed','error');console.error(e);}
+}
+
+function clearMillForm(){
+  ['m-name','m-town','m-lat','m-lng','m-contact'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('m-state').value='';
+  document.getElementById('m-edit-id').textContent='';
+  document.getElementById('m-airtable-id').textContent='';
+  document.querySelectorAll('#mill-product-checklist input').forEach(x=>x.checked=false);
+  document.getElementById('mill-price-section').innerHTML='';
+}
+
+function editMill(id){
+  const m=mills.find(x=>x.id===id); if(!m)return;
+  document.getElementById('m-name').value=m.name;
+  document.getElementById('m-state').value=m.state;
+  document.getElementById('m-town').value=m.town;
+  document.getElementById('m-lat').value=m.lat||'';
+  document.getElementById('m-lng').value=m.lng||'';
+  document.getElementById('m-contact').value=m.contact;
+  document.getElementById('m-edit-id').textContent=m.id;
+  document.getElementById('m-airtable-id').textContent=m._atId||'';
+  document.querySelectorAll('#mill-product-checklist input').forEach(x=>{x.checked=m.products.includes(x.value);});
+  updateMillPriceSection();
+  setTimeout(()=>{
+    m.products.forEach(p=>{
+      const mid=p.replace(/[^a-z0-9]/gi,'_');
+      const el=document.getElementById('mprice_'+mid);
+      if(el&&m.prices[p])el.value=m.prices[p];
+    });
+  },80);
+  showTab('mills');
+}
+
+async function deleteMill(id){
+  if(!confirm('Delete this mill?'))return;
+  const m=mills.find(x=>x.id===id);
+  if(AT_CONFIGURED&&m?._atId){
+    try{await atDelete('Mills',m._atId);}catch(e){showToast('Delete failed','error');return;}
+  }
+  mills=mills.filter(m=>m.id!==id);
+  if(!AT_CONFIGURED) lsSave('neff_mills3',mills);
+  renderMills();showToast('Mill deleted');
+}
+
+function renderMills(){
+  const q=(document.getElementById('mill-search').value||'').toLowerCase();
+  const list=mills.filter(m=>!q||m.name.toLowerCase().includes(q)||m.town.toLowerCase().includes(q)||m.state.toLowerCase().includes(q));
+  document.getElementById('mill-count').textContent=list.length+' mill'+(list.length!==1?'s':'');
+  const el=document.getElementById('mills-grid');
+  if(!list.length){el.innerHTML='<div class="empty-state" style="grid-column:1/-1">No mills match.</div>';return;}
+  el.innerHTML=list.map(m=>'<div class="mill-card">'
+    +'<div class="mill-card-header"><div>'
+    +'<div class="mill-name">'+m.name+'</div>'
+    +'<div class="mill-loc">'+m.town+(m.lat&&m.lng?' &middot; '+m.lat.toFixed(3)+', '+m.lng.toFixed(3):'')+'</div>'
+    +(m.contact?'<div class="mill-loc">'+m.contact+'</div>':'')
+    +'</div><div style="display:flex;gap:4px">'
+    +'<button class="btn btn-ghost btn-sm" onclick="editMill(\''+m.id+'\')">Edit</button>'
+    +'<button class="mill-delete-btn" onclick="deleteMill(\''+m.id+'\')" title="Delete">&#x2715;</button>'
+    +'</div></div>'
+    +'<div class="mill-products-list">'+m.products.map(p=>{
+      const pr=m.prices[p];
+      const u=ALL_PRODUCTS.find(x=>x.name===p)?.unit||'';
+      return '<span class="mill-product-tag">'+p+(pr?' $'+pr+'/'+u:'')+'</span>';
+    }).join('')+'</div></div>'
+  ).join('');
+}
+
+// ============================================================
+// DISTANCE — OSRM (no key needed)
+// ============================================================
+function distKey(la1,ln1,la2,ln2){return la1.toFixed(4)+','+ln1.toFixed(4)+'|'+la2.toFixed(4)+','+ln2.toFixed(4);}
+
+async function roadMiles(la1,ln1,la2,ln2){
+  const k=distKey(la1,ln1,la2,ln2);
+  if(distCache[k]!==undefined)return{mi:distCache[k],road:true};
+  try{
+    const url='https://router.project-osrm.org/route/v1/driving/'+ln1+','+la1+';'+ln2+','+la2+'?overview=false';
+    const ctrl=new AbortController();
+    const timer=setTimeout(()=>ctrl.abort(),8000);
+    const r=await fetch(url,{signal:ctrl.signal});
+    clearTimeout(timer);
+    const d=await r.json();
+    if(d.code==='Ok'&&d.routes?.[0]){
+      const mi=parseFloat((d.routes[0].distance/1609.34).toFixed(1));
+      distCache[k]=mi; lsSave('neff_dc',distCache);
+      return{mi,road:true};
+    }
+  }catch(e){}
+  return{mi:parseFloat((haversine(la1,ln1,la2,ln2)*1.3).toFixed(1)),road:false};
+}
+
+function haversine(la1,ln1,la2,ln2){
+  const R=3958.8,dLa=(la2-la1)*Math.PI/180,dLn=(ln2-ln1)*Math.PI/180;
+  const a=Math.sin(dLa/2)**2+Math.cos(la1*Math.PI/180)*Math.cos(la2*Math.PI/180)*Math.sin(dLn/2)**2;
+  return R*2*Math.atan2(Math.sqrt(a),Math.sqrt(1-a));
+}
+
+// ============================================================
+// MILL MATCHING
+// ============================================================
+function populateMatchingDropdowns(){
+  const hSel=document.getElementById('match-harvest'); const cv=hSel.value;
+  hSel.innerHTML='<option value="">All Harvests</option>';
+  submissions.forEach(s=>{hSel.innerHTML+='<option value="'+s.id+'">'+s.woodlot+' ('+(s.state||'?')+')</option>';});
+  if(cv)hSel.value=cv;
+  const pSel=document.getElementById('match-product'); const cp=pSel.value;
+  pSel.innerHTML='<option value="">All Products</option>';
+  const seen=new Set();
+  submissions.forEach(s=>Object.keys(s.products).forEach(p=>{
+    if(!seen.has(p)){seen.add(p);pSel.innerHTML+='<option value="'+p+'">'+p+'</option>';}
+  }));
+  if(cp)pSel.value=cp;
+}
+
+async function runMatching(){
+  if(!mills.length){document.getElementById('matching-results').innerHTML='<div class="no-mills-msg">No mills in database.</div>';return;}
+  const hf    =document.getElementById('match-harvest').value;
+  const pf    =document.getElementById('match-product').value;
+  const maxD  =parseFloat(document.getElementById('match-maxdist').value)||150;
+  const tRate =parseFloat(document.getElementById('match-truckrate').value)||4.50;
+  const subs  =hf?submissions.filter(s=>s.id===hf):submissions;
+  const cs    =subs.filter(s=>s.lat&&s.lng);
+  const cLat  =cs.length?cs.reduce((a,s)=>a+s.lat,0)/cs.length:null;
+  const cLng  =cs.length?cs.reduce((a,s)=>a+s.lng,0)/cs.length:null;
+  const agg={};
+  subs.forEach(s=>Object.entries(s.products).forEach(([n,{vol,unit}])=>{
+    if(pf&&n!==pf)return;
+    if(!agg[n])agg[n]={vol:0,unit};
+    agg[n].vol+=vol;
+  }));
+  if(!Object.keys(agg).length){document.getElementById('matching-results').innerHTML='<div class="empty-state">No products match filters.</div>';return;}
+  document.getElementById('matching-results').innerHTML='<div class="loading-state" style="padding:30px">Computing road distances...</div>';
+  const results=[];
+  for(const [product,{vol,unit}] of Object.entries(agg)){
+    const elig=mills.filter(m=>m.products.includes(product)&&(m.prices[product]||0)>0);
+    if(!elig.length){results.push({product,vol,unit,mills:[]});continue;}
+    const rows=[];
+    for(const m of elig){
+      let distInfo={mi:null,road:false};
+      if(cLat&&cLng&&m.lat&&m.lng) distInfo=await roadMiles(cLat,cLng,m.lat,m.lng);
+      if(distInfo.mi!==null&&distInfo.mi>maxD)continue;
+      const millPx=m.prices[product];
+      const truck =distInfo.mi!==null?parseFloat((tRate*distInfo.mi).toFixed(2)):null;
+      const net   =truck!==null?parseFloat((millPx-truck).toFixed(2)):null;
+      rows.push({mill:m,mi:distInfo.mi,road:distInfo.road,millPx,truck,net});
+    }
+    rows.sort((a,b)=>{
+      if(a.net===null&&b.net===null)return(b.millPx||0)-(a.millPx||0);
+      if(a.net===null)return 1; if(b.net===null)return -1;
+      return b.net-a.net;
+    });
+    results.push({product,vol,unit,mills:rows});
+  }
+  results.sort((a,b)=>a.product.localeCompare(b.product));
+  let html='';
+  if(!cLat||!cLng) html+='<div class="no-mills-msg" style="margin-bottom:10px">&#9888; No harvest coordinates — use the location autocomplete on submissions to enable road distance ranking.</div>';
+  results.forEach(r=>{
+    if(!r.mills.length){
+      html+='<div class="match-card"><div class="match-header"><span class="mh-product">'+r.product+'</span><span class="mh-vol">'+r.vol.toLocaleString(undefined,{maximumFractionDigits:2})+' '+r.unit+'</span></div><div class="no-mills-msg">No mills within '+maxD+' mi accept this product at current prices.</div></div>';
+      return;
+    }
+    const topNet=r.mills[0].net;
+    const rows=r.mills.slice(0,6).map((m,i)=>{
+      const rc=i===0?'rank-1':i===1?'rank-2':i===2?'rank-3':'';
+      const badge='<span class="roads-badge '+(m.road?'road':'est')+'">'+(m.road?'road':'est.')+'</span>';
+      const isTop=m.net!==null&&m.net===topNet;
+      return '<div class="match-mill-row">'
+        +'<div class="mmr-name"><span class="rank-badge '+(rc||'')+'"><b>'+(i+1)+'</b></span>'
+        +m.mill.name+' <span style="font-family:\'IBM Plex Mono\',monospace;font-size:9px;color:var(--muted)">('+m.mill.state+')</span></div>'
+        +'<div class="mmr-cell">'+(m.mi!==null?m.mi.toFixed(0)+' mi':'—')+' '+badge+'</div>'
+        +'<div class="mmr-cell pos">$'+m.millPx+'/'+r.unit+'</div>'
+        +'<div class="mmr-cell">'+(m.truck!==null?'$'+m.truck.toFixed(0)+'/'+r.unit:'—')+'</div>'
+        +'<div class="mmr-cell '+(isTop?'pos':'')+'"><b>'+(m.net!==null?'$'+m.net.toFixed(0)+'/'+r.unit:'—')+'</b></div>'
+        +'</div>';
+    }).join('');
+    html+='<div class="match-card">'
+      +'<div class="match-header"><span class="mh-product">'+r.product+'</span>'
+      +'<span class="mh-vol">'+r.vol.toLocaleString(undefined,{maximumFractionDigits:2})+' '+r.unit+'</span></div>'
+      +'<div class="match-cols"><div>Mill</div><div>Distance</div><div>Mill price</div><div>Trucking</div><div>Net revenue</div></div>'
+      +rows+'</div>';
+  });
+  document.getElementById('matching-results').innerHTML=html||'<div class="empty-state">No matches found.</div>';
+}
+
+// ============================================================
+// TABS
+// ============================================================
+function showTab(name){
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('tab-'+name).classList.add('active');
+  const idx={entry:0,submissions:1,dashboard:2,mills:3,matching:4}[name];
+  if(idx!==undefined) document.querySelectorAll('.tab-btn')[idx].classList.add('active');
+  if(name==='submissions'){renderSubmissions();}
+  if(name==='dashboard'){renderDashboard();}
+  if(name==='mills'){renderMills();}
+  if(name==='matching'){populateMatchingDropdowns();runMatching();}
+}
+
+function showToast(msg,type){
+  const t=document.getElementById('toast');
+  t.textContent=msg; t.className='show';
+  t.style.background=type==='error'?'var(--red)':'var(--pine)';
+  setTimeout(()=>{t.className='';},2800);
+}
+
+// ============================================================
+// INIT
+// ============================================================
+(async function init(){
+  buildProductTable();
+  buildMillChecklist();
+  await loadAll();
+  renderMills();
+})();
+</script>
+</body>
+</html>
