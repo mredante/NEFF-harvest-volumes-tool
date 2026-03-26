@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -157,7 +158,63 @@ body{font-family:'IBM Plex Sans',sans-serif;background:var(--cream);color:var(--
 .note-text{font-size:11px;color:var(--muted);font-style:italic;margin-top:8px}
 .config-banner{background:var(--parchment);border:1px solid var(--border);border-left:3px solid var(--gold);border-radius:3px;padding:10px 14px;margin-bottom:14px;font-size:12px;font-family:'IBM Plex Mono',monospace;color:var(--bark)}
 .config-banner strong{color:var(--forest)}
+/* Leaflet loaded via CDN below */
+.map-container{border-radius:4px;overflow:hidden;border:1px solid var(--border)}
+.map-toggle{display:flex;gap:0;margin-bottom:14px;border:1px solid var(--border);border-radius:3px;overflow:hidden;width:fit-content}
+.map-toggle-btn{padding:7px 18px;background:var(--white);border:none;font-family:'IBM Plex Mono',monospace;font-size:10px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);cursor:pointer;transition:all .15s;border-right:1px solid var(--border)}
+.map-toggle-btn:last-child{border-right:none}
+.map-toggle-btn.active{background:var(--pine);color:var(--cream)}
+.map-legend{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
+.map-legend-item{display:flex;align-items:center;gap:5px;font-size:11px;font-family:'IBM Plex Mono',monospace;color:var(--muted)}
+.map-legend-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
+.map-legend-line{width:22px;height:3px;border-radius:2px;flex-shrink:0}
+.flow-select-row{display:flex;align-items:center;gap:10px;margin-bottom:12px;flex-wrap:wrap}
+#map-mills{height:520px}
+#map-flow{height:520px}
+.leaflet-popup-content{font-family:'IBM Plex Sans',sans-serif;font-size:12px;line-height:1.5}
+.leaflet-popup-content b{color:#1a3a2a}
+.leaflet-popup-content .popup-products{margin-top:4px;font-size:11px;color:#5a5a52}
+
+/* Grade reference modal */
+.grade-modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:300;display:flex;align-items:center;justify-content:center;padding:16px}
+.grade-modal{background:var(--white);border-radius:6px;max-width:780px;width:100%;max-height:90vh;overflow:hidden;display:flex;flex-direction:column;border:1px solid var(--border)}
+.grade-modal-header{padding:14px 18px;background:var(--forest);color:var(--cream);display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
+.grade-modal-header h3{font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--gold)}
+.grade-modal-body{padding:0;overflow-y:auto;flex:1}
+.grade-tabs{display:flex;border-bottom:2px solid var(--parchment);background:var(--cream);flex-shrink:0}
+.grade-tab{padding:9px 16px;background:none;border:none;font-family:'IBM Plex Mono',monospace;font-size:10px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-2px;white-space:nowrap}
+.grade-tab:hover{color:var(--text)}
+.grade-tab.active{color:var(--pine);border-bottom-color:var(--pine)}
+.grade-content{display:none;padding:16px 18px}
+.grade-content.active{display:block}
+.grade-card{background:var(--white);border:1px solid var(--border);border-radius:4px;margin-bottom:12px;overflow:hidden}
+.grade-card-header{padding:9px 14px;display:flex;align-items:center;gap:10px;border-bottom:1px solid var(--parchment)}
+.grade-badge{font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:700;padding:3px 10px;border-radius:3px}
+.grade-select{background:#1a3a2a;color:#c9a84c}
+.grade-1{background:#1e40af;color:#fff}
+.grade-2{background:#166534;color:#fff}
+.grade-3{background:#78350f;color:#fef3c7}
+.grade-pallet{background:#374151;color:#f3f4f6}
+.grade-card-title{font-size:13px;font-weight:600;color:var(--forest)}
+.grade-card-subtitle{font-size:11px;color:var(--muted);font-family:'IBM Plex Mono',monospace;margin-left:auto}
+.grade-specs{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:0;padding:0}
+.grade-spec-row{display:flex;justify-content:space-between;align-items:baseline;padding:6px 14px;border-bottom:1px solid var(--parchment);font-size:12px}
+.grade-spec-row:last-child{border-bottom:none}
+.gs-label{color:var(--muted);font-size:11px}
+.gs-val{font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:600;color:var(--text)}
+.gs-val.good{color:#166534}
+.gs-val.warn{color:#92400e}
+.grade-defect-table{width:100%;border-collapse:collapse;font-size:11px;margin:8px 0 0}
+.grade-defect-table th{background:var(--parchment);padding:5px 10px;font-family:'IBM Plex Mono',monospace;font-size:9px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);text-align:left;border-bottom:1px solid var(--border)}
+.grade-defect-table td{padding:5px 10px;border-bottom:1px solid var(--parchment);vertical-align:top}
+.grade-defect-table tr:last-child td{border-bottom:none}
+.grade-note{background:var(--parchment);border-left:3px solid var(--gold);padding:8px 12px;font-size:11px;color:var(--bark);border-radius:0 3px 3px 0;margin:10px 0}
+.info-btn{display:inline-flex;align-items:center;justify-content:center;width:16px;height:16px;border-radius:50%;background:var(--pine);color:var(--cream);font-size:9px;font-weight:700;border:none;cursor:pointer;margin-left:5px;flex-shrink:0;vertical-align:middle;font-family:'IBM Plex Mono',monospace;line-height:1;padding:0}
+.info-btn:hover{background:var(--forest)}
+
 </style>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
 </head>
 <body>
 
@@ -175,6 +232,7 @@ body{font-family:'IBM Plex Sans',sans-serif;background:var(--cream);color:var(--
   <button class="tab-btn" onclick="showTab('dashboard')">&#9658; Regional Dashboard</button>
   <button class="tab-btn" onclick="showTab('mills')">&#9658; Mill Database</button>
   <button class="tab-btn" onclick="showTab('matching')">&#9658; Mill Matching</button>
+  <button class="tab-btn" onclick="showTab('maps')">&#9658; Maps</button>
 </div>
 
 <div class="main">
@@ -350,6 +408,55 @@ body{font-family:'IBM Plex Sans',sans-serif;background:var(--cream);color:var(--
   <div id="matching-results"></div>
 </div>
 
+
+<!-- ===== MAPS ===== -->
+<div id="tab-maps" class="panel">
+  <div class="map-toggle">
+    <button class="map-toggle-btn active" id="mtbtn-mills" onclick="switchMap('mills')">Mill Database</button>
+    <button class="map-toggle-btn" id="mtbtn-flow" onclick="switchMap('flow')">Wood Flow</button>
+  </div>
+
+  <!-- MILL MAP -->
+  <div id="mapview-mills">
+    <div class="card" style="padding:12px 14px;margin-bottom:10px">
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--muted);margin-bottom:8px;font-weight:600;text-transform:uppercase;letter-spacing:.08em">Filter mills</div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+        <input type="text" id="mill-map-search" placeholder="Search mill name..." oninput="renderMillMap()"
+          style="padding:5px 9px;border:1px solid var(--border);border-radius:3px;font-size:13px;background:var(--white);width:220px">
+        <select id="mill-map-state" onchange="renderMillMap()"
+          style="padding:5px 9px;border:1px solid var(--border);border-radius:3px;font-size:13px;background:var(--white)">
+          <option value="">All States</option>
+          <option>ME</option><option>NH</option><option>VT</option><option>MA</option><option>CT</option>
+        </select>
+        <select id="mill-map-type" onchange="renderMillMap()"
+          style="padding:5px 9px;border:1px solid var(--border);border-radius:3px;font-size:13px;background:var(--white)">
+          <option value="">All Types</option>
+          <option>Sawmill</option><option>Pulp &amp; Paper</option><option>Biomass</option><option>Pellets</option><option>Veneer</option>
+        </select>
+        <span id="mill-map-count" style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--muted);margin-left:auto"></span>
+      </div>
+    </div>
+    <div class="map-container"><div id="map-mills"></div></div>
+    <div class="map-legend" id="mill-map-legend"></div>
+  </div>
+
+  <!-- FLOW MAP -->
+  <div id="mapview-flow" style="display:none">
+    <div class="card" style="padding:12px 14px;margin-bottom:10px">
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--muted);margin-bottom:8px;font-weight:600;text-transform:uppercase;letter-spacing:.08em">Select harvest to visualize</div>
+      <div class="flow-select-row">
+        <select id="flow-harvest-select" onchange="renderFlowMap()"
+          style="padding:5px 9px;border:1px solid var(--border);border-radius:3px;font-size:13px;background:var(--white);min-width:280px">
+          <option value="">— select a harvest —</option>
+        </select>
+        <span id="flow-map-status" style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--muted)"></span>
+      </div>
+    </div>
+    <div class="map-container"><div id="map-flow"></div></div>
+    <div class="map-legend" id="flow-map-legend"></div>
+  </div>
+</div>
+
 </div><!-- /main -->
 
 <!-- DETAIL MODAL -->
@@ -373,7 +480,7 @@ body{font-family:'IBM Plex Sans',sans-serif;background:var(--cream);color:var(--
 // 2. Paste it below (keep the quotes)
 // 3. Paste your Base ID below — it's in the URL when you open your base:
 //    https://airtable.com/appXXXXXXXXXXXXXX/...  ← that part
-const AIRTABLE_TOKEN = 'pat0iWC338OPTbkOm.a53e447401d5ee298f89c8abbb18ff5786c60015630d04c1b0fcda24cc85be5a';
+const AIRTABLE_TOKEN = 'pat0iWC338OPTbkOm.de8fbea502832bfc498bcd3eab8824ceb946319b538c9ed933af600e0cf44536';
 const AIRTABLE_BASE  = 'appOz4S4xetLHykr5';
 // ============================================================
 
@@ -416,13 +523,12 @@ const PRODUCT_DEFS=[
     {name:"Red pine sawlogs", unit:"MBF",unitType:"mbf"},
     {name:"Red pine poles",   unit:"MBF",unitType:"mbf"},
     {name:"Hemlock logs",     unit:"MBF",unitType:"mbf"},
-    {name:"Cedar hygrade",    unit:"cords",unitType:"cord"},
+    {name:"Cedar hygrade",    unit:"MBF", unitType:"mbf"},
   ]},
   {cat:"Logs by Weight",products:[
     {name:"Pallet logs by weight",  unit:"tons",unitType:"ton"},
     {name:"Spruce logs by weight",  unit:"tons",unitType:"ton"},
     {name:"Fir logs by weight",     unit:"tons",unitType:"ton"},
-    {name:"Birch boltwood",         unit:"cords",unitType:"cord"},
   ]},
   {cat:"Hard Maple",products:[
     {name:"Hard maple veneer", unit:"MBF",unitType:"mbf"},
@@ -734,7 +840,9 @@ function buildProductTable(){
             +opts.map(u=>'<option value="'+u+'"'+(u===p.unit?' selected':'')+'>'+u+'</option>').join('')
             +'</select>';
       const tr = document.createElement('tr');
-      tr.innerHTML = '<td>'+p.name+'</td>'
+      const hasGradeInfo = GRADE_INFO_PRODUCTS.includes(p.name);
+      const infoBtn = hasGradeInfo ? ' <button class="info-btn" onclick="event.stopPropagation();openGradeModal(this.dataset.grade)" data-grade="'+p.name+'" title="View grading specifications">i</button>' : '';
+      tr.innerHTML = '<td>'+p.name+infoBtn+'</td>'
         +'<td><input type="number" class="vol-input" id="vol_'+pid+'" min="0" step="0.1" placeholder="" oninput="updateSummary()"></td>'
         +'<td>'+unitCell+'</td>'
         +'<td><input type="text" style="width:100%;padding:3px 6px;border:1px solid var(--border);border-radius:2px;font-size:11px;background:var(--white)" id="note_'+pid+'" placeholder=""></td>';
@@ -833,6 +941,8 @@ async function submitHarvest(){
     submissions.push(rec);
     clearForm();
     showToast('Submitted: '+woodlot);
+    // Auto-navigate to flow map
+    setTimeout(()=>showFlowMapForLatest(), 400);
   }catch(e){
     showToast('Save failed — check connection','error');
     console.error(e);
@@ -1295,12 +1405,20 @@ function showTab(name){
   document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
   document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
   document.getElementById('tab-'+name).classList.add('active');
-  const idx={entry:0,submissions:1,dashboard:2,mills:3,matching:4}[name];
+  const idx={entry:0,submissions:1,dashboard:2,mills:3,matching:4,maps:5}[name];
   if(idx!==undefined) document.querySelectorAll('.tab-btn')[idx].classList.add('active');
   if(name==='submissions'){renderSubmissions();}
   if(name==='dashboard'){renderDashboard();}
   if(name==='mills'){renderMills();}
   if(name==='matching'){populateMatchingDropdowns();runMatching();}
+  if(name==='maps'){
+    // Init mill map by default on first open
+    if(!mapsInitialized.mills){
+      setTimeout(()=>{initMillMap();},60);
+    } else {
+      setTimeout(()=>millMap&&millMap.invalidateSize(),60);
+    }
+  }
 }
 
 function showToast(msg,type){
@@ -1308,6 +1426,359 @@ function showToast(msg,type){
   t.textContent=msg; t.className='show';
   t.style.background=type==='error'?'var(--red)':'var(--pine)';
   setTimeout(()=>{t.className='';},2800);
+}
+
+
+
+// ============================================================
+// GRADE REFERENCE MODAL
+// ============================================================
+const GRADE_INFO_PRODUCTS = [
+  'White pine select','White pine #1','White pine #2','White pine #3','White pine pallet'
+];
+const GRADE_TAB_MAP = {
+  'White pine select':'select',
+  'White pine #1':'1',
+  'White pine #2':'2',
+  'White pine #3':'3',
+  'White pine pallet':'pallet'
+};
+
+function openGradeModal(gradeName){
+  // Always open to comparison tab; grade name could be used for future highlighting
+  showGradeTab('compare');
+  document.getElementById('grade-modal').style.display='flex';
+}
+
+function showGradeTab(name){
+  document.querySelectorAll('.grade-tab').forEach((b,i)=>{
+    const tabs=['compare','hancock','irving','general'];
+    b.classList.toggle('active', tabs[i]===name);
+  });
+  document.querySelectorAll('.grade-content').forEach(el=>{
+    el.classList.toggle('active', el.id==='gtab-'+name);
+  });
+}
+
+function closeGradeModal(e){
+  if(e.target===document.getElementById('grade-modal'))
+    document.getElementById('grade-modal').style.display='none';
+}
+
+// ============================================================
+// MAPS — Leaflet
+// ============================================================
+let millMap = null;
+let flowMap = null;
+let millMarkers = [];
+let flowLayers = [];
+let mapsInitialized = {mills: false, flow: false};
+
+// Product category → color for flow lines
+const CAT_COLORS = {
+  'Pulp & Fiber':      '#2563eb',  // blue
+  'Softwood Lumber':   '#16a34a',  // green
+  'Logs by Weight':    '#ca8a04',  // amber
+  'Hard Maple':        '#9333ea',  // purple
+  'Yellow Birch':      '#c026d3',  // fuchsia
+  'White / Black Birch':'#0891b2', // cyan
+  'Soft Maple':        '#7c3aed',  // violet
+  'White Ash':         '#059669',  // emerald
+  'Red Oak':           '#dc2626',  // red
+};
+const FALLBACK_COLOR = '#6b7280';
+
+function catColor(cat){
+  return CAT_COLORS[cat] || FALLBACK_COLOR;
+}
+
+// Mill type → marker color
+const TYPE_COLORS = {
+  'Sawmill':       '#2d5a3d',
+  'Pulp & Paper':  '#1e40af',
+  'Biomass':       '#92400e',
+  'Pellets':       '#6b21a8',
+  'Veneer':        '#0f766e',
+  'Chipping':      '#b45309',
+  'Other':         '#374151',
+};
+
+function millTypeColor(type){
+  if(!type) return '#374151';
+  for(const [k,v] of Object.entries(TYPE_COLORS)){
+    if(type.toLowerCase().includes(k.toLowerCase())) return v;
+  }
+  return '#374151';
+}
+
+function makeCircleIcon(color, radius=8){
+  return L.divIcon({
+    className:'',
+    html:`<div style="width:${radius*2}px;height:${radius*2}px;border-radius:50%;background:${color};border:2px solid rgba(255,255,255,0.85);box-shadow:0 1px 4px rgba(0,0,0,0.35)"></div>`,
+    iconSize:[radius*2,radius*2],
+    iconAnchor:[radius,radius],
+    popupAnchor:[0,-(radius+2)]
+  });
+}
+
+function makeStarIcon(color){
+  return L.divIcon({
+    className:'',
+    html:`<div style="width:18px;height:18px;background:${color};border:2.5px solid #fff;border-radius:3px;box-shadow:0 1px 6px rgba(0,0,0,0.4);transform:rotate(45deg)"></div>`,
+    iconSize:[18,18],
+    iconAnchor:[9,9],
+    popupAnchor:[0,-12]
+  });
+}
+
+// ---- SWITCH MAP VIEW ----
+function switchMap(view){
+  document.getElementById('mapview-mills').style.display = view==='mills'?'block':'none';
+  document.getElementById('mapview-flow').style.display  = view==='flow' ?'block':'none';
+  document.getElementById('mtbtn-mills').classList.toggle('active', view==='mills');
+  document.getElementById('mtbtn-flow').classList.toggle('active',  view==='flow');
+  if(view==='mills' && !mapsInitialized.mills){ initMillMap(); }
+  if(view==='flow'  && !mapsInitialized.flow) { initFlowMap(); populateFlowSelect(); }
+  // Leaflet needs a size invalidation when revealed from display:none
+  setTimeout(()=>{
+    if(view==='mills' && millMap) millMap.invalidateSize();
+    if(view==='flow'  && flowMap) flowMap.invalidateSize();
+  }, 60);
+}
+
+// ---- MILL MAP ----
+function initMillMap(){
+  millMap = L.map('map-mills', {zoomControl:true}).setView([44.8, -70.0], 7);
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{
+    attribution:'&copy; <a href="https://openstreetmap.org">OpenStreetMap</a>',
+    maxZoom:18
+  }).addTo(millMap);
+  mapsInitialized.mills = true;
+  renderMillMap();
+}
+
+function renderMillMap(){
+  if(!millMap) return;
+  const q     = (document.getElementById('mill-map-search')?.value||'').toLowerCase();
+  const state = document.getElementById('mill-map-state')?.value||'';
+  const type  = document.getElementById('mill-map-type')?.value||'';
+
+  // Clear existing markers
+  millMarkers.forEach(m=>millMap.removeLayer(m));
+  millMarkers = [];
+
+  const filtered = mills.filter(m=>{
+    if(!m.lat||!m.lng) return false;
+    if(state && m.state!==state) return false;
+    if(type  && !m.type?.toLowerCase().includes(type.toLowerCase()) &&
+                !m.name?.toLowerCase().includes(type.toLowerCase())) return false;
+    if(q && !m.name?.toLowerCase().includes(q) && !m.town?.toLowerCase().includes(q)) return false;
+    return true;
+  });
+
+  document.getElementById('mill-map-count').textContent = filtered.length + ' mill' + (filtered.length!==1?'s':'');
+
+  // Build legend from unique types present
+  const typesPresent = [...new Set(filtered.map(m=>inferMillType(m)))];
+
+  filtered.forEach(m=>{
+    const mtype = inferMillType(m);
+    const color = millTypeColor(mtype);
+    const icon  = makeCircleIcon(color);
+    const productLines = (m.products||[]).slice(0,8).map(p=>{
+      const pr = m.prices?.[p];
+      return `${p}${pr?' — $'+pr+'/'+getUnit(p):''}`;
+    }).join('<br>');
+    const more = (m.products||[]).length>8 ? `<br><em>+${(m.products||[]).length-8} more</em>` : '';
+    const popup = `<b>${m.name}</b><br>${m.town||''}<br>`
+      + `<span style="font-size:10px;color:#888;font-family:monospace">${mtype}</span>`
+      + (productLines ? `<div class="popup-products">${productLines}${more}</div>` : '');
+    const marker = L.marker([m.lat, m.lng], {icon}).addTo(millMap);
+    marker.bindPopup(popup, {maxWidth:260, minWidth:180});
+    millMarkers.push(marker);
+  });
+
+  // Fit bounds if we have markers
+  if(filtered.length>0){
+    const group = L.featureGroup(millMarkers);
+    millMap.fitBounds(group.getBounds().pad(0.1));
+  }
+
+  // Legend
+  const legendEl = document.getElementById('mill-map-legend');
+  legendEl.innerHTML = typesPresent.map(t=>
+    `<div class="map-legend-item">
+      <div class="map-legend-dot" style="background:${millTypeColor(t)}"></div>
+      <span>${t}</span>
+    </div>`
+  ).join('');
+}
+
+function inferMillType(m){
+  const n = (m.name||'').toLowerCase();
+  const t = (m.millType||m.type||'').toLowerCase();
+  const combined = n + ' ' + t;
+  if(combined.includes('pulp')||combined.includes('paper')) return 'Pulp & Paper';
+  if(combined.includes('pellet')) return 'Pellets';
+  if(combined.includes('biomass')||combined.includes('reenergy')||combined.includes('mcneil')||combined.includes('ryegate')||combined.includes('burgess')) return 'Biomass';
+  if(combined.includes('veneer')||combined.includes('columbia')) return 'Veneer';
+  if(combined.includes('chip')) return 'Chipping';
+  if(combined.includes('plywood')||combined.includes('osb')||combined.includes('huber')||combined.includes('lp ')||combined.includes('lp h')) return 'Engineered Wood';
+  return 'Sawmill';
+}
+
+function getUnit(productName){
+  const p = ALL_PRODUCTS.find(x=>x.name===productName);
+  return p?p.unit:'unit';
+}
+
+// ---- FLOW MAP ----
+function initFlowMap(){
+  flowMap = L.map('map-flow', {zoomControl:true}).setView([44.8, -70.0], 7);
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{
+    attribution:'&copy; <a href="https://openstreetmap.org">OpenStreetMap</a>',
+    maxZoom:18
+  }).addTo(flowMap);
+  mapsInitialized.flow = true;
+}
+
+function populateFlowSelect(){
+  const sel = document.getElementById('flow-harvest-select');
+  if(!sel) return;
+  const cur = sel.value;
+  sel.innerHTML = '<option value="">— select a harvest —</option>';
+  submissions.forEach(s=>{
+    sel.innerHTML += `<option value="${s.id}">${s.woodlot} (${s.state||'?'}) — ${s.date}</option>`;
+  });
+  if(cur) sel.value = cur;
+}
+
+async function renderFlowMap(){
+  if(!flowMap) return;
+  // Clear old layers
+  flowLayers.forEach(l=>flowMap.removeLayer(l));
+  flowLayers = [];
+
+  const selId = document.getElementById('flow-harvest-select')?.value;
+  if(!selId){
+    document.getElementById('flow-map-status').textContent = 'Select a harvest above.';
+    document.getElementById('flow-map-legend').innerHTML = '';
+    return;
+  }
+
+  const harvest = submissions.find(s=>s.id===selId);
+  if(!harvest||!harvest.lat||!harvest.lng){
+    document.getElementById('flow-map-status').textContent = '⚠ No coordinates for this harvest — use location autocomplete when submitting.';
+    return;
+  }
+
+  document.getElementById('flow-map-status').textContent = 'Computing best mills...';
+
+  const tRate = parseFloat(document.getElementById('match-truckrate')?.value)||4.50;
+  const allProducts = Object.entries(harvest.products);
+  const usedColors = {};
+  const legendItems = {};
+  let linesDrawn = 0;
+
+  // Harvest marker — diamond shape
+  const harvestIcon = makeStarIcon('#c9a84c');
+  const harvestPopup = `<b>${harvest.woodlot}</b><br>${harvest.location||''}<br>`
+    + `<span style="font-size:10px;color:#888">${Object.keys(harvest.products).length} products &middot; ${harvest.acres?harvest.acres+' ac':''}</span>`;
+  const hMarker = L.marker([harvest.lat, harvest.lng], {icon:harvestIcon, zIndexOffset:1000}).addTo(flowMap);
+  hMarker.bindPopup(harvestPopup);
+  flowLayers.push(hMarker);
+
+  // For each product find top mill by net revenue
+  for(const [product, {vol, unit}] of allProducts){
+    const cat   = ALL_PRODUCTS.find(x=>x.name===product)?.cat || 'Other';
+    const color = catColor(cat);
+
+    const elig = mills.filter(m=>m.products?.includes(product) && (m.prices?.[product]||0)>0 && m.lat && m.lng);
+    if(!elig.length) continue;
+
+    // Score mills
+    let best = null;
+    let bestNet = -Infinity;
+    for(const m of elig){
+      const distInfo = await roadMiles(harvest.lat, harvest.lng, m.lat, m.lng);
+      const millPx = m.prices[product];
+      const truck  = distInfo.mi !== null ? tRate * distInfo.mi : null;
+      const net    = truck !== null ? millPx - truck : millPx * 0.7; // rough fallback
+      if(net > bestNet){ bestNet = net; best = {mill:m, mi:distInfo.mi, road:distInfo.road, millPx, truck, net}; }
+    }
+    if(!best) continue;
+
+    // Draw animated dashed line harvest → mill
+    const line = L.polyline(
+      [[harvest.lat, harvest.lng], [best.mill.lat, best.mill.lng]],
+      {color, weight:3, opacity:0.85, dashArray:'8 5'}
+    ).addTo(flowMap);
+
+    const midLat = (harvest.lat + best.mill.lat) / 2;
+    const midLng = (harvest.lng + best.mill.lng) / 2;
+    const labelIcon = L.divIcon({
+      className:'',
+      html:`<div style="background:${color};color:#fff;font-size:9px;font-family:monospace;padding:2px 5px;border-radius:3px;white-space:nowrap;box-shadow:0 1px 3px rgba(0,0,0,0.3)">${vol.toFixed(1)} ${unit}</div>`,
+      iconAnchor:[0,0]
+    });
+    const label = L.marker([midLat, midLng], {icon:labelIcon}).addTo(flowMap);
+
+    // Mill dot for this product
+    const millIcon = makeCircleIcon(color, 7);
+    const millMarker = L.marker([best.mill.lat, best.mill.lng], {icon:millIcon}).addTo(flowMap);
+    millMarker.bindPopup(
+      `<b>${best.mill.name}</b><br>${best.mill.town||''}<br>`
+      +`<span style="font-size:11px"><b>${product}</b><br>`
+      +(best.mi!==null?best.mi.toFixed(0)+' mi '+(best.road?'(road)':'(est)')+'<br>':'')
+      +`$${best.millPx}/${unit} mill price<br>`
+      +(best.truck!==null?`$${best.truck.toFixed(0)}/${unit} trucking<br>`:'')
+      +`<b>$${best.net.toFixed(0)}/${unit} net</b></span>`
+    );
+
+    line.bindPopup(
+      `<b>${product}</b><br>${harvest.woodlot} → ${best.mill.name}<br>`
+      +`${vol.toFixed(1)} ${unit} &middot; $${best.net.toFixed(0)}/${unit} net`
+    );
+
+    flowLayers.push(line, label, millMarker);
+    legendItems[cat] = color;
+    linesDrawn++;
+  }
+
+  // Fit map to all layers
+  if(flowLayers.length > 0){
+    const group = L.featureGroup(flowLayers);
+    flowMap.fitBounds(group.getBounds().pad(0.15));
+  }
+
+  document.getElementById('flow-map-status').textContent =
+    linesDrawn > 0
+      ? `${linesDrawn} product${linesDrawn!==1?'s':''} mapped to best mill by net revenue`
+      : '⚠ No mills matched any products from this harvest. Add mill prices in the Mill Database.';
+
+  // Legend
+  document.getElementById('flow-map-legend').innerHTML =
+    `<div class="map-legend-item"><div class="map-legend-dot" style="background:#c9a84c;transform:rotate(45deg)"></div><span>Harvest location</span></div>`
+    + Object.entries(legendItems).map(([cat,color])=>
+        `<div class="map-legend-item"><div class="map-legend-line" style="background:${color}"></div><span>${cat}</span></div>`
+      ).join('');
+}
+
+// Called from submitHarvest() after successful save — auto-switch to flow map
+function showFlowMapForLatest(){
+  showTab('maps');
+  // Give the tab a tick to render, then switch to flow and select latest submission
+  setTimeout(()=>{
+    switchMap('flow');
+    setTimeout(()=>{
+      populateFlowSelect();
+      if(submissions.length>0){
+        const latest = submissions[submissions.length-1];
+        const sel = document.getElementById('flow-harvest-select');
+        if(sel){ sel.value = latest.id; renderFlowMap(); }
+      }
+    }, 150);
+  }, 80);
 }
 
 // ============================================================
@@ -1320,5 +1791,182 @@ function showToast(msg,type){
   renderMills();
 })();
 </script>
+
+<!-- GRADE REFERENCE MODAL -->
+<div class="grade-modal-overlay" id="grade-modal" style="display:none" onclick="closeGradeModal(event)">
+  <div class="grade-modal" style="max-width:1020px">
+    <div class="grade-modal-header">
+      <h3>White Pine Log Grading &#8212; Mill Specifications</h3>
+      <button style="background:none;border:none;color:var(--cream);cursor:pointer;font-size:18px;line-height:1" onclick="document.getElementById('grade-modal').style.display='none'">&#x2715;</button>
+    </div>
+    <div class="grade-tabs">
+      <button class="grade-tab active" onclick="showGradeTab('compare')">Grade Comparison</button>
+      <button class="grade-tab" onclick="showGradeTab('hancock')">Hancock Lumber</button>
+      <button class="grade-tab" onclick="showGradeTab('irving')">J.D. Irving</button>
+      <button class="grade-tab" onclick="showGradeTab('general')">Notes</button>
+    </div>
+    <div class="grade-modal-body">
+
+      <!-- COMPARISON -->
+      <div class="grade-content active" id="gtab-compare">
+        <div class="grade-note" style="margin-bottom:12px">
+          <b>Scaling rule differs:</b> Hancock = International 1/4" rule &nbsp;|&nbsp; Irving = International 1/8" rule. The 1/8" rule yields higher scale &#8212; the same log scales more BF at Irving than at Hancock.
+        </div>
+        <p style="font-family:'IBM Plex Mono',monospace;font-size:9px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:6px">Hancock Lumber</p>
+        <div style="overflow-x:auto;margin-bottom:16px">
+        <table class="grade-defect-table" style="min-width:700px">
+          <thead>
+            <tr>
+              <th style="width:150px">Attribute</th>
+              <th style="background:#1a3a2a;color:#c9a84c">Select</th>
+              <th style="background:#1e40af;color:#fff">#1 Long</th>
+              <th style="background:#1e40af;color:#fff">#1 Short</th>
+              <th style="background:#166534;color:#fff">#2</th>
+              <th style="background:#374151;color:#f3f4f6">#3 Pallet</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td>Min. top diam.</td><td>14"</td><td>7"</td><td>7"</td><td>8"</td><td>8"</td></tr>
+            <tr><td>Max. butt diam.</td><td>40"</td><td>40"</td><td>40"</td><td>40"</td><td>30" (any point)</td></tr>
+            <tr><td>Lengths</td><td>10'&#8211;16'</td><td>16' only</td><td>10', 12', 14'</td><td>10'&#8211;16'</td><td>10'&#8211;16' (NO 8')</td></tr>
+            <tr><td>Knots</td><td>1/2" pin knots only</td><td>Max. 1" OR 3 clear faces</td><td>Max. 1" OR 3 clear faces</td><td>Sound red to 4"; black to 2"; OR 2 clear faces</td><td>Max. 5"</td></tr>
+          </tbody>
+        </table>
+        </div>
+        <p style="font-family:'IBM Plex Mono',monospace;font-size:9px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:6px">J.D. Irving</p>
+        <div style="overflow-x:auto;margin-bottom:12px">
+        <table class="grade-defect-table" style="min-width:700px">
+          <thead>
+            <tr>
+              <th style="width:150px">Attribute</th>
+              <th style="background:#1a3a2a;color:#c9a84c">Select</th>
+              <th style="background:#1e40af;color:#fff">16 ft. Sawlog</th>
+              <th style="background:#166534;color:#fff">Short Sawlog</th>
+              <th style="background:#78350f;color:#fef3c7">Long Pallet</th>
+              <th style="background:#374151;color:#f3f4f6">Pallet</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td>Min. top diam.</td><td>14"</td><td>5"</td><td>5"</td><td>8"</td><td>8"</td></tr>
+            <tr><td>Max. diam.</td><td>48"</td><td>48"</td><td>48"</td><td>48"</td><td>48"</td></tr>
+            <tr><td>Lengths</td><td>10', 12', 14', 16'</td><td>16' only</td><td>10', 12', 14'</td><td>10', 12', 14', 16'</td><td>8'</td></tr>
+            <tr><td>Knots / faces</td><td>3 clear faces; max 1/2" knots on 4th face</td><td>Max. 2" black, 3" red</td><td>Max. 2" black, 3" red</td><td colspan="2">Logs not meeting above specs</td></tr>
+          </tbody>
+        </table>
+        </div>
+        <div style="overflow-x:auto">
+        <table class="grade-defect-table" style="min-width:700px">
+          <thead><tr><th style="width:150px">General spec</th><th>Hancock</th><th>Irving</th></tr></thead>
+          <tbody>
+            <tr><td>Stain</td><td>No blue stain or wormholes; live wood within 7 days of cutting (April&#8211;Sept.)</td><td><b>None acceptable</b> (year-round)</td></tr>
+            <tr><td>Sweep</td><td>Up to 1-1/2" per 8' without deduction</td><td>1-1/2" per 8' max before discount; logs over 17'0" and under 8'4" rejected</td></tr>
+            <tr><td>Seams</td><td>One straight seam acceptable</td><td>One straight seam acceptable with discount on scale (not grade)</td></tr>
+            <tr><td>Rot</td><td>No pencil rot; up to 50% diam. well-centered rot with deduction (11"+ logs, deduction on scale)</td><td>Up to 50% well-centered with deduction on scale (not grade)</td></tr>
+            <tr><td>Metal</td><td colspan="2">Logs with iron or iron stain will not be accepted</td></tr>
+            <tr><td>Limbs</td><td>Trimmed flush; no double tops</td><td>Trimmed flush with log</td></tr>
+            <tr><td>Cull policy</td><td>Mill property 10 days after delivery</td><td>Mill property after 10 days</td></tr>
+            <tr><td>Scaling rule</td><td>International 1/4" rule (inside bark)</td><td>International 1/8" rule (inside bark); rejected if over 50% deduction</td></tr>
+            <tr><td>Load composition</td><td>60%+ 16' logs by volume; max 10 logs of 10' per load; NO 8' logs</td><td>Logs cut April&#8211;Sept. must be delivered within 10 days</td></tr>
+          </tbody>
+        </table>
+        </div>
+      </div>
+
+      <!-- HANCOCK DETAIL -->
+      <div class="grade-content" id="gtab-hancock">
+        <div class="grade-note" style="margin-bottom:12px"><b>Hancock Lumber &#8212; Eastern White Pine Log Grade Specifications (January 2025)</b><br>Scaling rule: International 1/4" rule, measured inside bark</div>
+        <div style="overflow-x:auto;margin-bottom:14px">
+        <table class="grade-defect-table">
+          <thead><tr><th>Grade</th><th>Min. Diam.</th><th>Max. Diam.</th><th>Length</th><th>Specifications</th></tr></thead>
+          <tbody>
+            <tr><td><span class="grade-badge grade-select">Select</span></td><td>14"</td><td>40" butt end</td><td>10'&#8211;16'</td><td>1/2" pin knots allowed</td></tr>
+            <tr><td><span class="grade-badge grade-1">#1 Long</span></td><td>7"</td><td>40" butt end</td><td>16' only</td><td>Max. knot size 1" or three clear faces</td></tr>
+            <tr><td><span class="grade-badge grade-1">#1 Short</span></td><td>7"</td><td>40" butt end</td><td>10', 12', 14'</td><td>Max. knot size 1" or three clear faces</td></tr>
+            <tr><td><span class="grade-badge grade-2">#2</span></td><td>8"</td><td>40" butt end</td><td>10'&#8211;16'</td><td>Sound red knots to 4"; black knots to 2"; or two clear faces</td></tr>
+            <tr><td><span class="grade-badge grade-pallet">#3 Pallet</span></td><td>8"</td><td>30" any point</td><td>10'&#8211;16' (NO 8')</td><td>Max. knot size 5"</td></tr>
+          </tbody>
+        </table>
+        </div>
+        <div class="grade-note"><b>Overview</b><br>
+        &#8226; Target 16' logs for 60% or more of the load<br>
+        &#8226; Limit 10' logs to no more than 10 per load<br>
+        &#8226; Minimize the number of 10' and 14' logs on loads<br>
+        &#8226; The mills <b>do not</b> accept 8' logs<br>
+        &#8226; Keep pallet grade logs to a minimum<br>
+        &#8226; Trim excessive butt flares; trim limbs flush<br>
+        &#8226; Logs without enough trim will be scaled back to next nominal length
+        </div>
+        <div class="grade-note" style="margin-top:8px"><b>Minimum Specifications</b><br>
+        <b>Trim:</b> Logs with insufficient trim scaled back to next nominal length. 6" trim. Maximum length 16'10"; minimum 60% 16' logs by volume per load; minimum length 10'6"; 10 per load maximum. NO 8' logs accepted.<br><br>
+        <b>7&#8211;10" dia. logs:</b> No rot, sweep, crook, or insect damage<br>
+        <b>Stain/wormholes:</b> Fresh, live wood delivered within seven days of cutting (April&#8211;Sept.); no blue stain or wormholes allowed<br>
+        <b>Sweep:</b> Up to 1-1/2" per 8' accepted without deduction<br>
+        <b>Seams:</b> One straight seam acceptable<br>
+        <b>Deductions:</b> No pencil rot; up to 50% of diameter, well-centered rot allowed with deduction in logs 11"+ only; scale deductions taken for knots over 5"<br>
+        <b>Preparation:</b> Limbs trimmed flush; no double tops<br>
+        <b>Metal:</b> Logs with iron or iron stain will not be accepted<br>
+        <b>Cull logs:</b> Become mill property 10 days after delivery
+        </div>
+      </div>
+
+      <!-- IRVING DETAIL -->
+      <div class="grade-content" id="gtab-irving">
+        <div class="grade-note" style="margin-bottom:12px"><b>J.D. Irving &#8212; White Pine Specifications (Card ID 23)</b><br>Scaling rule: International 1/8" rule, measured inside bark. Note: Select grade &#8212; 8" logs max 10% per load. Contacts: Stanton Ellis (207) 557-5793; Corey Richardson (207) 557-5024. Gatehouse: (207) 562-4210.</div>
+        <div style="overflow-x:auto;margin-bottom:14px">
+        <table class="grade-defect-table">
+          <thead><tr><th>S#</th><th>Grade</th><th>Top Dia.</th><th>Lengths</th><th>Specifications</th></tr></thead>
+          <tbody>
+            <tr><td>1</td><td><span class="grade-badge grade-select">Select</span></td><td>14"</td><td>10', 12', 14', 16'</td><td>3 clear faces; not more than 1/2" knots on fourth face</td></tr>
+            <tr><td>2</td><td><span class="grade-badge grade-1">16 ft. Sawlog</span></td><td>5"</td><td>16' only</td><td>Max. knot size 2" black, 3" red</td></tr>
+            <tr><td>3</td><td><span class="grade-badge grade-2">Short Sawlog</span></td><td>5"</td><td>10', 12', 14'</td><td>Max. knot size 2" black, 3" red</td></tr>
+            <tr><td>4</td><td><span class="grade-badge grade-3">Long Pallet</span></td><td>8"</td><td>10', 12', 14', 16'</td><td>Logs not meeting above specs</td></tr>
+            <tr><td>5</td><td><span class="grade-badge grade-pallet">Pallet</span></td><td>8"</td><td>8'</td><td>Logs not meeting above specs</td></tr>
+          </tbody>
+        </table>
+        </div>
+        <div class="grade-note"><b>General Specifications</b><br>
+        <b>Max. diameter:</b> 48"<br>
+        <b>5&#8211;7" logs:</b> 4' minimum to 6" (star on scale slip = mistrim)<br>
+        <b>Crotches:</b> Scaled back to beginning of crotch<br>
+        <b>Culls:</b> After 10 days, culled logs become mill property<br>
+        <b>Limbs:</b> Must be trimmed flush with log<br>
+        <b>Metal:</b> Any logs showing iron or iron stain will not be accepted<br>
+        <b>Rot:</b> Up to 50% well-centered &#8212; allowed with discount on scale (not grade)<br>
+        <b>Seams:</b> One straight seam acceptable with discount on scale (not grade)<br>
+        <b>Stain: None acceptable</b><br>
+        <b>Sweep:</b> 1-1/2" per 8' maximum before discount; logs over 17'0" and under 8'4" will be rejected<br>
+        <b>Length:</b> All logs scaled using International 1/8" rule measured inside bark; no log accepted if over 50% deduction; logs cut April through September must be delivered within 10 days<br><br>
+        <b>Scaling hours:</b> 6:00am&#8211;3:30pm Mon&#8211;Thurs year round; 6:00&#8211;2:00 Friday<br>
+        <b>Unloading hours:</b> 6:00am&#8211;7:00pm Mon&#8211;Thurs year round; 6:00&#8211;2:00 Friday
+        </div>
+      </div>
+
+      <!-- NOTES -->
+      <div class="grade-content" id="gtab-general">
+        <div class="grade-note"><b>Scaling rule difference</b><br>
+        Hancock uses the International 1/4" rule; Irving uses the International 1/8" rule. The 1/8" rule yields higher scale &#8212; the same physical log will produce more board feet at Irving. This affects both the check received and how deductions are calculated. When comparing prices per MBF between mills, account for this difference.
+        </div>
+        <div class="grade-note" style="margin-top:8px"><b>Grade name mapping &#8212; Hancock vs. Irving</b><br>
+        Hancock <b>Select</b> &#8776; Irving <b>Select</b> (both 14" min.; similar knot tolerance on clear faces)<br>
+        Hancock <b>#1 Long</b> &#8776; Irving <b>16 ft. Sawlog</b> (16' logs; Hancock 7" min. vs. Irving 5" min.)<br>
+        Hancock <b>#1 Short</b> &#8776; Irving <b>Short Sawlog</b> (10'&#8211;14'; knot tolerance similar)<br>
+        Hancock <b>#2</b> &#8212; no direct Irving equivalent; Irving goes from Sawlog to Pallet<br>
+        Hancock <b>#3 Pallet</b> &#8776; Irving <b>Long Pallet / Pallet</b><br><br>
+        Irving accepts 5" top diameter on sawlogs; Hancock requires 7"+ for #1. Small-top logs that make sawlog at Irving may be #2 or pallet at Hancock.
+        </div>
+        <div class="grade-note" style="margin-top:8px"><b>Stain policy</b><br>
+        Irving: None acceptable (year-round)<br>
+        Hancock: No blue stain or wormholes; live wood within 7 days of cutting (April&#8211;Sept.)<br>
+        Irving's stain policy is stricter and year-round. Stained material should be separated before delivery to Irving.
+        </div>
+        <div class="grade-note" style="margin-top:8px"><b>Additional mills</b><br>
+        Specs for Robbins Lumber, Pleasant River, and other mills will be added here as scale cards are collected.
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
 </body>
 </html>
